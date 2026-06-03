@@ -152,10 +152,11 @@ function buildAuthModal() {
     <div class="auth-modal" style="background:#111;border:1px solid rgba(52,211,153,.25);border-radius:20px;padding:2.5rem;width:100%;max-width:420px;position:relative;box-shadow:0 0 60px rgba(0,0,0,.8);">
       <button onclick="closeAuthModal()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:1.5rem;line-height:1;">&times;</button>
 
-      <div style="display:flex;gap:1rem;margin-bottom:2rem;">
+      <div id="auth-tabs" style="display:flex;gap:1rem;margin-bottom:2rem;">
         <button class="auth-tab active" data-tab="signin" style="flex:1;padding:.75rem;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.4);border-radius:10px;color:#34d399;font-size:11px;text-transform:uppercase;letter-spacing:.2em;font-weight:700;cursor:pointer;">Sign In</button>
         <button class="auth-tab" data-tab="signup" style="flex:1;padding:.75rem;background:transparent;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:rgba(255,255,255,.5);font-size:11px;text-transform:uppercase;letter-spacing:.2em;font-weight:700;cursor:pointer;">Register</button>
       </div>
+      <h3 id="auth-reset-heading" style="display:none;font-family:var(--font-sans);font-size:1.1rem;font-weight:600;margin-bottom:1.5rem;color:#fff;text-align:center;">Reset Password</h3>
 
       <!-- Sign In Form -->
       <form class="auth-form" id="auth-signin-form" onsubmit="return false;">
@@ -414,6 +415,13 @@ function buildAuthModal() {
 
 function openAuthModal() {
   if (!authModalEl) buildAuthModal();
+  // Reset UI về trạng thái mặc định (hiện tabs, ẩn reset heading)
+  const tabs = authModalEl.querySelector('#auth-tabs');
+  const heading = authModalEl.querySelector('#auth-reset-heading');
+  if (tabs) tabs.style.display = 'flex';
+  if (heading) heading.style.display = 'none';
+  authModalEl.querySelectorAll('.auth-form').forEach(f => f.style.display = 'none');
+  authModalEl.querySelector('#auth-signin-form').style.display = 'block';
   authModalEl.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
@@ -432,11 +440,12 @@ authDb.auth.onAuthStateChange((event, session) => {
   currentUser = session?.user ?? null;
 
   if (event === 'PASSWORD_RECOVERY') {
-    // User clicked reset link in email → show reset password form
     if (!authModalEl) buildAuthModal();
     authModalEl.querySelectorAll('.auth-form').forEach(f => f.style.display = 'none');
     authModalEl.querySelectorAll('.auth-error').forEach(e => e.style.display = 'none');
     authModalEl.querySelectorAll('.auth-success').forEach(e => e.style.display = 'none');
+    authModalEl.querySelector('#auth-tabs').style.display = 'none';
+    authModalEl.querySelector('#auth-reset-heading').style.display = 'block';
     authModalEl.querySelector('#auth-reset-form').style.display = 'block';
     authModalEl.style.display = 'flex';
     document.body.style.overflow = 'hidden';
