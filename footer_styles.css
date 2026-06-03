@@ -1,0 +1,227 @@
+/* =====================================================================
+   ECO-FOOTER-B  —  Version B: Creative redesign
+   Deep-space terminal aesthetic — scanline grid, glowing nodes, orbital
+   ===================================================================== */
+.eco-footer-b {
+  position: relative;
+  background: transparent;
+  border-top: 1px solid rgba(52,211,153,0.12);
+  padding: 3.5rem 4rem 0;
+  font-family: "Inter", ui-sans-serif, sans-serif;
+  color: rgba(245,245,245,0.65);
+  z-index: 10;
+  overflow: hidden;
+}
+
+/* Subtle hex grid watermark */
+.eco-footer-b::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgba(52,211,153,0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent, rgba(0,0,0,0.18) 30%, rgba(0,0,0,0.18) 70%, transparent);
+}
+
+/* Animated glow orb */
+.eco-footer-b::after {
+  content: "";
+  position: absolute;
+  bottom: 60%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  height: 160px;
+  background: radial-gradient(ellipse, rgba(52,211,153,0.07) 0%, transparent 70%);
+  pointer-events: none;
+  animation: fbGlowPulse 6s ease-in-out infinite;
+}
+
+@keyframes fbGlowPulse {
+  0%,100% { opacity: .6; transform: translateX(-50%) scaleX(1); }
+  50%     { opacity: 1;  transform: translateX(-50%) scaleX(1.08); }
+}
+
+.eco-footer-b__inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 1fr 1.5fr;
+  gap: 3rem;
+  padding-bottom: 2.5rem;
+}
+@media (max-width: 900px) {
+  .eco-footer-b__inner { grid-template-columns: 1fr 1fr; gap: 2rem; }
+  .eco-footer-b { padding: 2.5rem 1.5rem 0; }
+}
+@media (max-width: 540px) {
+  .eco-footer-b__inner { grid-template-columns: 1fr; }
+}
+
+/* Brand */
+.eco-footer-b__logo {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin-bottom: 1.1rem;
+}
+.eco-footer-b__logo-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(52,211,153,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 14px rgba(52,211,153,0.18), inset 0 0 8px rgba(52,211,153,0.06);
+  animation: fbLogoPulse 4s ease-in-out infinite;
+}
+@keyframes fbLogoPulse {
+  0%,100% { box-shadow: 0 0 14px rgba(52,211,153,0.18), inset 0 0 8px rgba(52,211,153,0.06); }
+  50%     { box-shadow: 0 0 22px rgba(52,211,153,0.35), inset 0 0 12px rgba(52,211,153,0.12); }
+}
+.eco-footer-b__logo-text {
+  font-family: "Orbitron", sans-serif;
+  font-size: .85rem;
+  font-weight: 900;
+  letter-spacing: .15em;
+  color: #f5f5f5;
+}
+.eco-footer-b__logo-text span { color: #34d399; }
+
+.eco-footer-b__tagline {
+  font-size: .77rem;
+  line-height: 1.7;
+  color: rgba(245,245,245,0.38);
+  max-width: 21rem;
+  border-left: 2px solid rgba(52,211,153,0.25);
+  padding-left: .75rem;
+}
+
+/* Status pill */
+.eco-footer-b__status {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  margin-top: 1.1rem;
+  padding: .3rem .75rem;
+  border: 1px solid rgba(52,211,153,0.22);
+  border-radius: 2rem;
+  font-size: .62rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: rgba(52,211,153,0.7);
+}
+.eco-footer-b__status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 6px #34d399;
+  animation: fbDotBlink 1.8s ease-in-out infinite;
+}
+@keyframes fbDotBlink {
+  0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+}
+
+/* Section headings — angular bracket style */
+.eco-footer-b__col-title {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .65rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #34d399;
+  margin-bottom: 1.25rem;
+}
+.eco-footer-b__col-title::before {
+  content: "//";
+  opacity: .5;
+  font-family: monospace;
+  font-size: .7rem;
+}
+
+/* Nav links — terminal-style */
+.eco-footer-b__nav {
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+.eco-footer-b__nav button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: .82rem;
+  color: rgba(245,245,245,0.45);
+  text-align: left;
+  padding: .3rem .5rem;
+  letter-spacing: .02em;
+  position: relative;
+  border-left: 2px solid transparent;
+  transition: color .22s ease, border-color .22s ease, background .22s ease, padding-left .22s ease;
+}
+.eco-footer-b__nav button:hover {
+  color: #e2fef6;
+  border-left-color: #34d399;
+  background: rgba(52,211,153,0.06);
+  padding-left: .85rem;
+  text-shadow: 0 0 16px rgba(52,211,153,0.4);
+}
+
+/* Contact — card style */
+.eco-footer-b__contact {
+  display: flex;
+  flex-direction: column;
+  gap: .7rem;
+}
+.eco-footer-b__contact-row {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .78rem;
+  color: rgba(245,245,245,0.45);
+  padding: .5rem .75rem;
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: .35rem;
+  transition: border-color .2s, color .2s, background .2s;
+}
+.eco-footer-b__contact-row:hover {
+  border-color: rgba(52,211,153,0.3);
+  color: rgba(245,245,245,0.85);
+  background: rgba(52,211,153,0.05);
+}
+.eco-footer-b__contact-icon {
+  width: 26px; height: 26px;
+  border-radius: .25rem;
+  background: rgba(52,211,153,0.1);
+  border: 1px solid rgba(52,211,153,0.2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Bottom */
+.eco-footer-b__bottom {
+  position: relative;
+  /*border-top: 1px solid rgba(255,255,255,0.06); */
+  padding: 1.1rem 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .75rem;
+  font-size: .65rem;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: rgba(245,245,245,0.22);
+}
+.eco-footer-b__bottom-left { display: flex; gap: 2rem; flex-wrap: wrap; }
+.eco-footer-b__bottom-right { display: flex; align-items: center; gap: .5rem; }
+.eco-footer-b__bottom-sig {
+  font-family: "Orbitron", sans-serif;
+  font-size: .55rem;
+  color: rgba(52,211,153,0.35);
+  letter-spacing: .1em;
+}

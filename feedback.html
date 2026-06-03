@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoLens | Feedback</title>
+  <link rel="icon" href="/assets/images/leaf.ico"/>
+  <link rel="stylesheet" href="style_new.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="footer_styles.css" />
+</head>
+<body>
+
+  <!-- Background -->
+  <div class="bg-layer" aria-hidden="true">
+    <div class="bg-image"></div>
+    <div class="bg-overlay-dark"></div>
+    <div class="bg-gradient-tb"></div>
+    <div class="bg-glow bg-glow-top"></div>
+    <div class="bg-glow bg-glow-bottom"></div>
+  </div>
+
+  <!-- Decorative Side Elements -->
+  <div class="deco deco-right" aria-hidden="true">
+    <div class="deco-line"></div>
+    <span class="deco-text deco-text-right">Green Observation Satellite</span>
+    <div class="deco-line"></div>
+  </div>
+  <div class="deco deco-left" aria-hidden="true">
+    <span class="deco-text deco-text-left">ECO-LENS-01</span>
+    <div class="deco-line deco-line-tall"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav" id="main-nav">
+    <button class="nav-logo" onclick="navigateTo('home')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+      <div class="nav-brand">Eco<span class="nav-brand-dim">Lens</span></div>
+    </button>
+
+    <div class="nav-links" id="nav-links">
+      <button class="nav-link" data-page="home" onclick="navigateTo('home')">Home</button>
+      <button class="nav-link" data-page="about" onclick="navigateTo('about')">About Us</button>
+      <button class="nav-link" data-page="explore" onclick="navigateTo('explore')">Explore</button>
+      <button class="nav-link" data-page="news" onclick="navigateTo('news')">News</button>
+      <button class="nav-link" data-page="reviews" onclick="navigateTo('reviews')">Feedback</button>
+    </div>
+
+    <button class="nav-hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <div class="mobile-menu-header">
+      <span class="mobile-menu-brand">ECOLENS</span>
+      <button class="mobile-menu-close" onclick="toggleMenu()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <nav class="mobile-nav">
+      <button onclick="navigateTo('home'); toggleMenu()">Home</button>
+      <button onclick="navigateTo('about'); toggleMenu()">About Us</button>
+      <button onclick="navigateTo('explore'); toggleMenu()">Explore</button>
+      <button onclick="navigateTo('news'); toggleMenu()">News</button>
+      <button onclick="navigateTo('reviews'); toggleMenu()">Feedback</button>
+    </nav>
+    <div class="mobile-menu-footer">EST. 2026 — ENVIRONMENTAL DATA SOLUTIONS</div>
+  </div>
+
+  <div class="page page-reviews active" id="page-reviews">
+    <div class="page-inner">
+      <header class="page-header explore-header">
+        <div>
+          <div class="page-eyebrow">
+            <div class="eyebrow-line"></div>
+            <span class="text-micro emerald">Community Voices</span>
+          </div>
+          <h1 class="page-title">
+            Reviews &amp;<br>
+            <span class="page-title-bold">Feedback.</span>
+          </h1>
+        </div>
+        <div class="header-actions">
+          <button class="btn-primary" id="feedback-toggle-btn" onclick="toggleFeedbackForm()">
+            Share feedback
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+          <button class="btn-outline" onclick="navigateTo('home')">Go Back</button>
+        </div>
+      </header>
+
+      <div class="feedback-form-wrap" id="feedback-form" style="display:none">
+        <div class="feedback-form-inner">
+          <h3 class="form-title">Submit your insight</h3>
+          <div class="form-grid">
+            <div class="form-col">
+              <div class="form-field">
+                <label class="text-micro form-label">Full Name</label>
+                <input type="text" placeholder="e.g. John Doe" class="form-input" />
+              </div>
+              <div class="form-field">
+                <label class="text-micro form-label">Organization / Role</label>
+                <input type="text" placeholder="e.g. Climate Research Institute" class="form-input" />
+              </div>
+              <div class="form-field">
+                <label class="text-micro form-label">Your Rating</label>
+                <div class="feedback-rating" id="feedback-rating" role="radiogroup" aria-label="Rating">
+                  <button type="button" class="rating-star" data-value="1" aria-label="1 star">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" class="star-empty"/></svg>
+                  </button>
+                  <button type="button" class="rating-star" data-value="2" aria-label="2 stars">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" class="star-empty"/></svg>
+                  </button>
+                  <button type="button" class="rating-star" data-value="3" aria-label="3 stars">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" class="star-empty"/></svg>
+                  </button>
+                  <button type="button" class="rating-star" data-value="4" aria-label="4 stars">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" class="star-empty"/></svg>
+                  </button>
+                  <button type="button" class="rating-star" data-value="5" aria-label="5 stars">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" class="star-empty"/></svg>
+                  </button>
+                </div>
+                <input type="hidden" id="feedback-rating-value" name="rating" value="0" />
+              </div>
+            </div>
+            <div class="form-col">
+              <div class="form-field">
+                <label class="text-micro form-label">Your Message</label>
+                <textarea placeholder="How has EcoLens helped your mission?" class="form-textarea"></textarea>
+              </div>
+              <button class="btn-white form-submit">Send Review</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reviews-grid" id="reviews-grid"></div>
+    </div>
+  </div>
+
+  <!-- ===================== FOOTER VERSION B ===================== -->
+<footer class="eco-footer-b">
+  <div class="eco-footer-b__inner">
+    <div class="eco-footer-b__brand">
+      <div class="eco-footer-b__logo">
+        <div class="eco-footer-b__logo-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+          </svg>
+        </div>
+        <span class="eco-footer-b__logo-text">Eco<span>Lens</span></span>
+      </div>
+      <p class="eco-footer-b__tagline">Explore global environmental changes with interactive 3D technology. Real-time data fused with three decades of planetary records.</p>
+      <div class="eco-footer-b__status">
+        <span class="eco-footer-b__status-dot"></span>
+        Systems Operational — Live
+      </div>
+    </div>
+    <div class="eco-footer-b__col">
+      <div class="eco-footer-b__col-title">Quick Links</div>
+      <nav class="eco-footer-b__nav">
+        <button onclick="navigateTo('home')">Home</button>
+        <button onclick="navigateTo('about')">About Us</button>
+        <button onclick="navigateTo('reviews')">Feedback</button>
+      </nav>
+    </div>
+    <div class="eco-footer-b__col">
+      <div class="eco-footer-b__col-title">Key Features</div>
+      <nav class="eco-footer-b__nav">
+        <button onclick="navigateTo('explore')">Explore Globe</button>
+        <button onclick="navigateTo('news')">News Feed</button>
+      </nav>
+    </div>
+    <div class="eco-footer-b__col">
+      <div class="eco-footer-b__col-title">Contact</div>
+      <div class="eco-footer-b__contact">
+        <div class="eco-footer-b__contact-row">
+          <div class="eco-footer-b__contact-icon">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </div>
+          <span>laptd.25ds@vku.udn.vn</span>
+        </div>
+        <div class="eco-footer-b__contact-row">
+          <div class="eco-footer-b__contact-icon">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.59 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <span>+(84)123-4567</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="eco-footer-b__bottom">
+    <div class="eco-footer-b__bottom-left">
+      <span>EcoLens Project</span>
+      <span>© 2026 Environment Intelligence</span>
+      <span>Vietnam / Global</span>
+    </div>
+    <div class="eco-footer-b__bottom-right">
+      <span class="eco-footer-b__bottom-sig">ECO-LENS-01 — HTML GROUP</span>
+    </div>
+  </div>
+</footer>
+
+  <script src="js/api-keys.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app.js"></script>
+  <script src="js/reviews.js?v=3"></script>
+</body>
+</html>

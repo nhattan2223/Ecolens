@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoLens | Explore Earth</title>
+  <link rel="icon" href="/assets/images/leaf.ico"/>
+  <!-- Globe fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- EcoLens nav fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Globe styles (Rajdhani, globe UI) -->
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<body class="explore-earth-page">
+
+  <!-- ══════════════════════════════════════════════
+       NAV BAR
+  ══════════════════════════════════════════════ -->
+  <nav id="eco-nav">
+    <button class="eco-nav-logo" onclick="navigateTo('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+      </svg>
+      <div class="eco-nav-brand">Eco<span>Lens</span></div>
+    </button>
+
+    <div class="eco-nav-links">
+      <button class="eco-nav-link"        data-page="home"    onclick="navigateTo('home')">Home</button>
+      <button class="eco-nav-link"        data-page="about"   onclick="navigateTo('about')">About Us</button>
+      <button class="eco-nav-link active" data-page="explore" onclick="navigateTo('explore')">Explore</button>
+      <button class="eco-nav-link"        data-page="news"    onclick="navigateTo('news')">News</button>
+      <button class="eco-nav-link"        data-page="reviews" onclick="navigateTo('reviews')">Feedback</button>
+    </div>
+
+    <button class="eco-nav-hamburger" onclick="ecoToggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ══════════════════════════════════════════════
+       MOBILE MENU
+  ══════════════════════════════════════════════ -->
+  <div id="eco-mobile-menu">
+    <div class="eco-mm-header">
+      <span class="eco-mm-brand">ECOLENS</span>
+      <button class="eco-mm-close" onclick="ecoToggleMenu()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <nav class="eco-mm-nav">
+      <button onclick="navigateTo('home');   ecoToggleMenu()">Home</button>
+      <button onclick="navigateTo('about');  ecoToggleMenu()">About Us</button>
+      <button onclick="navigateTo('explore');ecoToggleMenu()">Explore</button>
+      <button onclick="navigateTo('news');   ecoToggleMenu()">News</button>
+      <button onclick="navigateTo('reviews');ecoToggleMenu()">Feedback</button>
+    </nav>
+    <div class="eco-mm-footer">EST. 2026 — ENVIRONMENTAL DATA SOLUTIONS</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       GLOBE UI (nguyên bản từ explore_earth.html)
+  ══════════════════════════════════════════════ -->
+  <div id="globe-container"></div>
+
+  <!-- Search -->
+  <div id="search-wrapper">
+    <input id="search-input" type="text" placeholder="🔍  find a country..." autocomplete="off" />
+    <div id="search-results"></div>
+  </div>
+
+  <!-- Gear -->
+  <div id="gear-wrapper">
+    <button id="gear-btn" title="Layer Controls">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8cff7a"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06
+                 a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09
+                 A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83
+                 l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09
+                 A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83
+                 l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09
+                 a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83
+                 l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09
+                 a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Layer Panel -->
+  <div id="layer-panel">
+    <button class="layer-btn" data-layer="temperature"><span class="layer-icon">🌡️</span> Temperature</button>
+    <button class="layer-btn" data-layer="pm25"><span class="layer-icon">💨</span> PM 2.5</button>
+    <button class="layer-btn" data-layer="forest"><span class="layer-icon">🌳</span> Forest Area</button>
+  </div>
+
+  <!-- Badge -->
+  <div id="active-layer-badge">
+    <span class="badge-dot"></span>
+    <span id="badge-text">–</span>
+  </div>
+
+  <!-- Timeline -->
+  <div id="timeline-wrapper">
+    <div id="timeline-card">
+      <div id="timeline-header">
+        <span id="timeline-label">Timeline</span>
+        <span id="timeline-year-display">2000</span>
+      </div>
+      <div id="timeline-track">
+        <input type="range" id="year-slider" min="0" max="5" step="1" value="0" />
+      </div>
+      <div id="tick-marks"></div>
+    </div>
+  </div>
+
+  <!-- City Info Panel -->
+  <div id="city-panel">
+    <div id="city-panel-inner">
+      <div id="city-panel-header">
+        <div>
+          <div id="city-panel-country">–</div>
+          <div id="city-panel-subtitle">Live Weather &amp; Air Quality</div>
+        </div>
+      </div>
+      <div id="city-panel-tabs">
+        <button class="panel-tab active" data-tab="live">📡 Live</button>
+        <button class="panel-tab" data-tab="history">📊 History</button>
+      </div>
+      <div id="live-section"></div>
+      <div id="history-section">
+        <div class="hist-chart-block">
+          <div class="hist-chart-title">🌡️ Temperature <span class="hist-chart-unit">(°C)</span></div>
+          <div class="hist-chart-wrap" id="chart-temp"></div>
+        </div>
+        <div class="hist-chart-block">
+          <div class="hist-chart-title">💨 PM 2.5 <span class="hist-chart-unit">(µg/m³)</span></div>
+          <div class="hist-chart-wrap" id="chart-pm25"></div>
+        </div>
+        <div class="hist-chart-block">
+          <div class="hist-chart-title">🌳 Forest Area <span class="hist-chart-unit">(%)</span></div>
+          <div class="hist-chart-wrap" id="chart-forest"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════════ -->
+  
+  <!-- ══════════════════════════════════════════════
+       SCRIPTS
+  ══════════════════════════════════════════════ -->
+
+  <!-- Globe dependencies -->
+  <script src="js/api-keys.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://unpkg.com/globe.gl"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+
+  <!-- EcoLens shared navigation (navigateTo, highlightActiveNav) -->
+  <script src="js/app.js"></script>
+
+  <!-- Globe main logic (ES module) -->
+  <script type="module" src="js/main.js"></script>
+
+  <!-- Nav helpers specific to this page -->
+  <script>
+    // Mobile menu toggle — uses separate prefix "eco" to avoid
+    // conflicting with any toggleMenu() defined inside globe scripts
+    function ecoToggleMenu() {
+      const menu = document.getElementById('eco-mobile-menu');
+      if (!menu) return;
+      menu.classList.toggle('open');
+      // Prevent body scroll while mobile menu is open
+      document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : 'hidden';
+      // body is always overflow:hidden for globe — just keep it so
+    }
+
+    // Mark "Explore" link as active on load
+    document.addEventListener('DOMContentLoaded', function () {
+      // highlightActiveNav from app.js handles data-page links —
+      // but this page uses .eco-nav-link classes, so handle manually:
+      document.querySelectorAll('.eco-nav-link').forEach(function (btn) {
+        btn.classList.toggle('active', btn.dataset.page === 'explore');
+      });
+    });
+  </script>
+</body>
+</html>

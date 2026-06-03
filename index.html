@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoLens | Understanding the Planet's Breath</title>
+  <link rel="icon" href="/assets/images/leaf.ico"/>
+  <link rel="stylesheet" href="style_new.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="footer_styles.css" />
+</head>
+<body>
+
+  <!-- Background -->
+  <div class="bg-layer" aria-hidden="true">
+    <div class="bg-image"></div>
+    <div class="bg-overlay-dark"></div>
+    <div class="bg-gradient-tb"></div>
+    <div class="bg-glow bg-glow-top"></div>
+    <div class="bg-glow bg-glow-bottom"></div>
+  </div>
+
+  <!-- Decorative Side Elements -->
+  <div class="deco deco-right" aria-hidden="true">
+    <div class="deco-line"></div>
+    <span class="deco-text deco-text-right">Green Observation Satellite</span>
+    <div class="deco-line"></div>
+  </div>
+  <div class="deco deco-left" aria-hidden="true">
+    <span class="deco-text deco-text-left">ECO-LENS-01</span>
+    <div class="deco-line deco-line-tall"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav" id="main-nav">
+    <button class="nav-logo" onclick="navigateTo('home')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+      <div class="nav-brand">Eco<span class="nav-brand-dim">Lens</span></div>
+    </button>
+
+    <div class="nav-links" id="nav-links">
+      <button class="nav-link active" data-page="home" onclick="navigateTo('home')">Home</button>
+      <button class="nav-link" data-page="about" onclick="navigateTo('about')">About Us</button>
+      <button class="nav-link" data-page="explore" onclick="navigateTo('explore')">Explore</button>
+      <button class="nav-link" data-page="news" onclick="navigateTo('news')">News</button>
+      <button class="nav-link" data-page="reviews" onclick="navigateTo('reviews')">Feedback</button>
+    </div>
+
+    <button class="nav-hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <div class="mobile-menu-header">
+      <span class="mobile-menu-brand">ECOLENS</span>
+      <button class="mobile-menu-close" onclick="toggleMenu()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <nav class="mobile-nav">
+      <button onclick="navigateTo('home'); toggleMenu()">Home</button>
+      <button onclick="navigateTo('about'); toggleMenu()">About Us</button>
+      <button onclick="navigateTo('explore'); toggleMenu()">Explore</button>
+      <button onclick="navigateTo('news'); toggleMenu()">News</button>
+      <button onclick="navigateTo('reviews'); toggleMenu()">Feedback</button>
+    </nav>
+    <div class="mobile-menu-footer">EST. 2026 — ENVIRONMENTAL DATA SOLUTIONS</div>
+  </div>
+
+  <!-- ===================== PAGE: HOME ===================== -->
+  <div class="page page-home active" id="page-home">
+    <main class="hero">
+      <div class="hero-inner">
+        <div class="hero-eyebrow">
+          <div class="eyebrow-line"></div>
+          <span class="text-micro emerald">Technology for a Green Planet</span>
+        </div>
+        <h1 class="hero-title">
+          Understanding the<br>
+          <span class="hero-title-bold">Planet's Breath.</span>
+        </h1>
+        <div class="hero-body">
+          <div class="hero-separator hidden-mobile"></div>
+          <p class="hero-desc">
+            EcoLens offers a dynamic window into the Earth's vital signs. Explore real-time climate data, 
+            historical trends, and global environmental shifts through our interactive 3D mapping 
+            platform. By visualizing both present conditions and past changes, we provide a deeper perspective
+            on the health of our world.
+          </p>
+          <div class="hero-cta">
+            <button class="btn-primary" onclick="navigateTo('explore')">
+              Monitor Now
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            </button>
+            <div class="cta-sub text-micro emerald-dim">Real-time Data — Digital Ecosystem</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <section class="features-grid">
+      <div class="feature-card">
+        <div class="feature-top">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 8c0 4.42-3.58 8-8 8"/><path d="M17 8A5 5 0 0 0 7 8c0 5.25 5 10 5 10"/><path d="M12 2v4"/><path d="M4.93 4.93l2.83 2.83"/></svg>
+          </div>
+          <span class="feature-num">01</span>
+        </div>
+        <h3 class="feature-title">FOREST COVERAGE</h3>
+        <p class="feature-desc">Visualize global green layers and track historical changes in forest areas over a 30-year timeline.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-top">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></svg>
+          </div>
+          <span class="feature-num">02</span>
+        </div>
+        <h3 class="feature-title">AIR QUALITY & TEMPERATURE</h3>
+        <p class="feature-desc">Monitor live Temp, PM 2.5, and AQI levels through interactive map layers.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-top">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg>
+          </div>
+          <span class="feature-num">03</span>
+        </div>
+        <h3 class="feature-title">INTERACTIVE 3D GLOBE</h3>
+        <p class="feature-desc">Seamlessly navigate the Earth to search, click, and view localized environmental metrics instantly.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-top">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <span class="feature-num">04</span>
+        </div>
+        <h3 class="feature-title">ENVIRONMENTAL NEWS</h3>
+        <p class="feature-desc">Stay informed with the latest global environmental updates and ecological events aggregated from reliable APIs.</p>
+      </div>
+    </section>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label text-micro"> HISTORICAL DATA</div>
+        <div class="stat-value emerald">30 Years</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label text-micro">REAL-TIME METRICS</div>
+        <div class="stat-value">24/7</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label text-micro">GLOBAL COVERAGE</div>
+        <div class="stat-value">200+</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label text-micro">LIVE API STATUS</div>
+        <div class="stat-signal">
+          <span class="signal-dot"></span>
+          <span class="signal-text">Connected &amp; Monitoring</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PAGE: ABOUT ===================== -->
+  <div class="page page-about" id="page-about">
+    <div class="page-inner">
+      <header class="page-header">
+        <div class="page-eyebrow">
+          <div class="eyebrow-line"></div>
+          <span class="text-micro emerald">Our Philosophy</span>
+        </div>
+        <h1 class="page-title">
+          Defining the<br>
+          <span class="page-title-bold">Standards of Care.</span>
+        </h1>
+        <div class="page-header-body">
+          <p class="page-intro">
+            EcoLens was born from a singular vision: that we cannot protect what we do not measure.
+            We bridge the gap between abstract climate data and actionable environmental intelligence.
+          </p>
+          <button class="btn-outline" onclick="navigateTo('home')">Back to Home</button>
+        </div>
+      </header>
+
+      <section class="about-split">
+        <div class="about-text">
+          <h2 class="section-heading">The Vision</h2>
+          <p class="body-text">
+            Established in 2026, EcoLens is a global collaborative effort between space agencies,
+            environmental scientists, and AI researchers. Our mission is to provide a unified,
+            high-fidelity digital twin of the Earth's ecosystem.
+          </p>
+          <div class="about-mini-grid">
+            <div class="mini-card">
+              <div class="mini-icon emerald">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              </div>
+              <h4 class="mini-title">Hyper-Local</h4>
+              <p class="mini-desc">Observing changes down to 10cm resolution.</p>
+            </div>
+            <div class="mini-card">
+              <div class="mini-icon emerald">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </div>
+              <h4 class="mini-title">Instant</h4>
+              <p class="mini-desc">Data processed at the edge on-orbit.</p>
+            </div>
+          </div>
+        </div>
+        <div class="about-image-wrap">
+          <div class="about-image-glow"></div>
+          <img
+            src="https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=2072&auto=format&fit=crop"
+            alt="Satellite view of Earth"
+            class="about-image"
+          />
+          <div class="about-badge">
+            <div class="about-badge-num">24/7</div>
+            <div class="text-micro">Global Surveillance</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="pillars-section">
+        <div class="text-micro text-center pillar-eyebrow">Core Pillars</div>
+        <div class="pillars-grid">
+          <div class="pillar">
+            <div class="pillar-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+            </div>
+            <h3 class="pillar-title">Precision</h3>
+            <p class="pillar-desc">Removing the noise from environmental monitoring to find the signal that matters.</p>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+            </div>
+            <h3 class="pillar-title">Integrity</h3>
+            <p class="pillar-desc">Blockchain-verified data trails ensuring climate accountability for corporations.</p>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <h3 class="pillar-title">Openness</h3>
+            <p class="pillar-desc">Empowering non-profits with free access to our critical observation streams.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta-section">
+        <h2 class="cta-title">Ready to make a difference?</h2>
+        <p class="cta-body">Join our network of environmental pioneers using data to rewrite the future of our home.</p>
+        <button class="btn-white">Contact our team</button>
+      </section>
+    </div>
+  </div>
+
+  <!-- ===================== PAGE: EXPLORE ===================== -->
+  <div class="page page-explore" id="page-explore">
+    <div class="page-inner">
+      <header class="page-header explore-header">
+        <div>
+          <div class="page-eyebrow">
+            <div class="eyebrow-line"></div>
+            <span class="text-micro emerald">Satellite Visualization</span>
+          </div>
+          <h1 class="page-title">
+            Global<br>
+            <span class="page-title-bold">Eco-Hotspots.</span>
+          </h1>
+        </div>
+        <div class="header-actions">
+          <div class="search-wrap hidden-mobile">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search coordinates..." class="search-input" />
+          </div>
+          <button class="btn-outline" onclick="navigateTo('home')">Go Back</button>
+        </div>
+      </header>
+
+      <div class="explore-layout">
+        <div class="explore-viewer">
+          <div class="viewer-wrap" id="explore-viewer">
+            <img src="https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?q=80&w=1000&auto=format&fit=crop" alt="Amazon Basin" class="viewer-img" id="viewer-img" />
+            <div class="viewer-gradient"></div>
+
+            <div class="viewer-top-left">
+              <div class="status-badge" id="viewer-status">
+                <span class="status-dot critical" id="status-dot"></span>
+                <span id="status-text">Critical</span>
+              </div>
+            </div>
+            <div class="viewer-top-right">
+              <button class="viewer-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+              </button>
+            </div>
+            <div class="viewer-bottom">
+              <div class="viewer-info">
+                <h2 class="viewer-location" id="viewer-location">Amazon Basin</h2>
+                <div class="viewer-coords">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="coords-icon"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <span id="viewer-coords">3.4653° S, 62.2159° W</span>
+                </div>
+              </div>
+              <div class="viewer-alert-box">
+                <div class="alert-label">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="alert-label-icon"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/></svg>
+                  Active Alert
+                </div>
+                <p class="alert-text" id="viewer-alert">Increased thermal activity detected</p>
+              </div>
+            </div>
+            <div class="scanline" aria-hidden="true"></div>
+          </div>
+        </div>
+
+        <div class="hotspot-list" id="hotspot-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PAGE: REVIEWS ===================== -->
+  <div class="page page-reviews" id="page-reviews">
+    <div class="page-inner">
+      <header class="page-header explore-header">
+        <div>
+          <div class="page-eyebrow">
+            <div class="eyebrow-line"></div>
+            <span class="text-micro emerald">Community Voices</span>
+          </div>
+          <h1 class="page-title">
+            Reviews &amp;<br>
+            <span class="page-title-bold">Feedback.</span>
+          </h1>
+        </div>
+        <div class="header-actions">
+          <button class="btn-primary" onclick="navigateTo('reviews')">
+            Share feedback
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+          <button class="btn-outline" onclick="navigateTo('home')">Go Back</button>
+        </div>
+      </header>
+      <div class="reviews-grid" id="reviews-grid">
+        <!-- Reviews loaded from feedback.html -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <!-- ===================== FOOTER VERSION B ===================== -->
+<footer class="eco-footer-b">
+  <div class="eco-footer-b__inner">
+    <div class="eco-footer-b__brand">
+      <div class="eco-footer-b__logo">
+        <div class="eco-footer-b__logo-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+            <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+          </svg>
+        </div>
+        <span class="eco-footer-b__logo-text">Eco<span>Lens</span></span>
+      </div>
+      <p class="eco-footer-b__tagline">Explore global environmental changes with interactive 3D technology. Real-time data fused with three decades of planetary records.</p>
+      <div class="eco-footer-b__status">
+        <span class="eco-footer-b__status-dot"></span>
+        Systems Operational — Live
+      </div>
+    </div>
+    <div class="eco-footer-b__col">
+      <div class="eco-footer-b__col-title">Quick Links</div>
+      <nav class="eco-footer-b__nav">
+        <button onclick="navigateTo('home')">Home</button>
+        <button onclick="navigateTo('about')">About Us</button>
+        <button onclick="navigateTo('reviews')">Feedback</button>
+      </nav>
+    </div>
+    <div class="eco-footer-b__col">
+      <div class="eco-footer-b__col-title">Key Features</div>
+      <nav class="eco-footer-b__nav">
+        <button onclick="navigateTo('explore')">Explore Globe</button>
+        <button onclick="navigateTo('news')">News Feed</button>
+      </nav>
+    </div>
+    <div class="eco-footer-b__col">
+      <div class="eco-footer-b__col-title">Contact</div>
+      <div class="eco-footer-b__contact">
+        <div class="eco-footer-b__contact-row">
+          <div class="eco-footer-b__contact-icon">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </div>
+          <span>laptd.25ds@vku.udn.vn</span>
+        </div>
+        <div class="eco-footer-b__contact-row">
+          <div class="eco-footer-b__contact-icon">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.59 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <span>+(84)123-4567</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="eco-footer-b__bottom">
+    <div class="eco-footer-b__bottom-left">
+      <span>EcoLens Project</span>
+      <span>© 2026 Environment Organization</span>
+      <span>Vietnam / Global</span>
+    </div>
+    <div class="eco-footer-b__bottom-right">
+      <span class="eco-footer-b__bottom-sig">ECO-LENS-01 — HTML GROUP</span>
+    </div>
+  </div>
+</footer>
+  <script src="js/app.js"></script>
+</body>
+</html>
