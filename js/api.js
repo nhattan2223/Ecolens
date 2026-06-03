@@ -1,33 +1,15 @@
-// api.js - Call the local project backend proxy instead of Supabase Edge Functions.
+// api.js — gọi API trực tiếp từ browser (không cần proxy Node.js)
 
-async function callLocalApi(path, options = {}) {
-  const res = await fetch(path, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
-  });
-
-  if (!res.ok) {
-    throw new Error(`${path} HTTP ${res.status}: ${res.statusText}`);
-  }
-
-  return res.json();
-}
+const { OPEN_WEATHER_KEY, GNEWS_KEY } = window.EcoLensApiKeys || {};
 
 export async function getCurrentWeather(lat, lon) {
   try {
-    const data = await callLocalApi('/api/get-weather', {
-      method: 'POST',
-      body: JSON.stringify({ lat, lon, type: 'weather' }),
-    });
-
-    if (!data.main) {
-      console.warn('[getCurrentWeather] Invalid response:', data);
-      return null;
-    }
-
+    if (!OPEN_WEATHER_KEY) throw new Error('Missing OPEN_WEATHER_KEY');
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${OPEN_WEATHER_KEY}&units=metric`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!data.main) return null;
     return {
       temp: data.main.temp,
       cityName: data.name,
@@ -40,16 +22,12 @@ export async function getCurrentWeather(lat, lon) {
 
 export async function getAirPollution(lat, lon) {
   try {
-    const data = await callLocalApi('/api/get-weather', {
-      method: 'POST',
-      body: JSON.stringify({ lat, lon, type: 'pollution' }),
-    });
-
-    if (!data.list || !data.list[0]) {
-      console.warn('[getAirPollution] Invalid response:', data);
-      return null;
-    }
-
+    if (!OPEN_WEATHER_KEY) throw new Error('Missing OPEN_WEATHER_KEY');
+    const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${OPEN_WEATHER_KEY}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!data.list || !data.list[0]) return null;
     const p = data.list[0];
     return {
       aqi: p.main.aqi,
@@ -63,15 +41,16 @@ export async function getAirPollution(lat, lon) {
 
 export async function getEnvironmentNews() {
   try {
-    const data = await callLocalApi('/api/get-news', {
-      method: 'GET',
-    });
-
+    if (!GNEWS_KEY) throw new Error('Missing GNEWS_KEY');
+    const query = encodeURIComponent('climate change OR environment');
+    const url = `https://gnews.io/api/v4/search?q=${query}&lang=en&max=6&apikey=${GNEWS_KEY}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
     if (data.errors) {
-      console.warn('[getEnvironmentNews] GNews returned errors:', data.errors);
+      console.warn('[getEnvironmentNews] GNews errors:', data.errors);
       return [];
     }
-
     return data.articles || [];
   } catch (err) {
     console.error('[getEnvironmentNews] Error:', err);
