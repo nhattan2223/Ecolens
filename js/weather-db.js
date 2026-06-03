@@ -1,10 +1,11 @@
 // weather-db.js — Cache thời tiết / AQI xuống Supabase (fallback khi API lỗi)
 // Gọi backend proxy để giấu API key
 
-const { SUPABASE_URL, SUPABASE_KEY, BACKEND_URL } = window.EcoLensApiKeys || {};
-const weatherDb = SUPABASE_URL && SUPABASE_KEY
-  ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-  : null;
+const { BACKEND_URL } = window.EcoLensApiKeys || {};
+// Dùng chung Supabase client từ auth.js để tránh multiple instances
+function getSharedDb() {
+  return (window.EcoLensAuth && window.EcoLensAuth.getDb()) || null;
+}
 
 let refreshTimer = null;
 
@@ -35,7 +36,7 @@ function flattenCities(entries) {
 
 // ── Gọi API qua backend proxy, theo batch ──
 export async function refreshAllCities() {
-  if (!weatherDb) {
+  if (!getSharedDb()) {
     console.warn('[WeatherDB] Supabase not available');
     return;
   }
@@ -79,7 +80,9 @@ export async function refreshAllCities() {
           }
         }
 
-        const { error } = await weatherDb
+        const db = getSharedDb();
+        if (!db) { console.warn('[WeatherDB] No Supabase client'); return; }
+        const { error } = await db
           .from('city_weather')
           .upsert(deduped, { onConflict: 'lat,lng' });
 
@@ -102,9 +105,10 @@ export async function refreshAllCities() {
 
 // ── Lấy cache từ Supabase cho 1 thành phố (dùng làm fallback) ──
 export async function getCachedWeather(lat, lng) {
-  if (!weatherDb) return null;
+  const db = getSharedDb();
+  if (!db) return null;
 
-  const { data, error } = await weatherDb
+  const { data, error } = await db
     .from('city_weather')
     .select('temperature, pm2_5, aqi, updated_at')
     .eq('lat', lat)
@@ -117,7 +121,7 @@ export async function getCachedWeather(lat, lng) {
 
 // ── Bắt đầu chu kỳ đồng bộ (1 lần ngay lập tức, sau đó mỗi 1 giờ) ──
 export function startWeatherSync() {
-  if (!weatherDb) return;
+  if (!getSharedDb()) return;
   refreshAllCities();
   if (refreshTimer) clearInterval(refreshTimer);
   refreshTimer = setInterval(refreshAllCities, 7200000);
