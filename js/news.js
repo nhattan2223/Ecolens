@@ -6,10 +6,9 @@
 
 import { getEnvironmentNews } from './api.js';
 
-const { SUPABASE_URL, SUPABASE_KEY } = window.EcoLensApiKeys || {};
-const newsDb = window.supabase && SUPABASE_URL && SUPABASE_KEY
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-  : null;
+function getSharedDb() {
+  return (window.EcoLensAuth && window.EcoLensAuth.getDb()) || null;
+}
 
 // ── Hàm tiện ích: escape HTML để tránh XSS ──
 function escHtml(str) {
@@ -27,7 +26,7 @@ let currentArticles = [];
 let newsLoaded = false;
 
 async function saveArticlesToSupabase(articles) {
-  if (!newsDb || !articles || !articles.length) return;
+  if (!getSharedDb() || !articles || !articles.length) return;
 
   const rows = articles
     .filter(a => a && a.url && a.url !== '#')
@@ -44,7 +43,10 @@ async function saveArticlesToSupabase(articles) {
 
   if (!rows.length) return;
 
-  const { error } = await newsDb
+  const db = getSharedDb();
+  if (!db) return;
+
+  const { error } = await db
     .from('news_articles')
     .insert(rows);
 
@@ -57,9 +59,10 @@ async function saveArticlesToSupabase(articles) {
 }
 
 async function loadCachedArticlesFromSupabase() {
-  if (!newsDb) return [];
+  const db = getSharedDb();
+  if (!db) return [];
 
-  const { data, error } = await newsDb
+  const { data, error } = await db
     .from('news_articles')
     .select('title, description, url, image_url, source_name, author, content, published_at')
     .order('published_at', { ascending: false })
@@ -85,12 +88,13 @@ async function loadCachedArticlesFromSupabase() {
 
 // ── Xoá bài báo cũ hơn 5 ngày ──
 async function cleanupOldArticles() {
-  if (!newsDb) return;
+  const db = getSharedDb();
+  if (!db) return;
 
   const fiveDaysAgo = new Date();
   fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
 
-  const { error, data } = await newsDb
+  const { error, data } = await db
     .from('news_articles')
     .delete()
     .lt('published_at', fiveDaysAgo.toISOString());
