@@ -83,6 +83,25 @@ async function loadCachedArticlesFromSupabase() {
   }));
 }
 
+// ── Xoá bài báo cũ hơn 5 ngày ──
+async function cleanupOldArticles() {
+  if (!newsDb) return;
+
+  const fiveDaysAgo = new Date();
+  fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+
+  const { error, data } = await newsDb
+    .from('news_articles')
+    .delete()
+    .lt('published_at', fiveDaysAgo.toISOString());
+
+  if (error) {
+    console.warn('[News] Could not cleanup old articles:', error);
+  } else if (data && data.length > 0) {
+    console.log(`[News] Cleaned up ${data.length} old article(s)`);
+  }
+}
+
 // ============================================================
 // HÀM: normaliseArticle(raw)
 // FIX: GNews dùng field "image" (không phải "urlToImage")
@@ -406,6 +425,8 @@ window.reloadNews = reloadNews;
 // HÀM: loadNews()
 // ============================================================
 export async function loadNews() {
+  cleanupOldArticles();
+
   const grid = document.getElementById('news-grid');
   if (!grid) return;
   if (newsLoaded) return;
@@ -448,6 +469,7 @@ export async function loadNews() {
   // Lưu để modal dùng
   currentArticles = articles;
   saveArticlesToSupabase(articles);
+  cleanupOldArticles();
 
   await new Promise(r => setTimeout(r, 600));
 

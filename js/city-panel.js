@@ -11,6 +11,7 @@ import {
   findHistByName, HIST_YEARS, HIST_CONFIGS
 } from './data.js';
 import { drawHistoryCanvas } from './chart-utils.js';
+import { getCachedWeather } from './weather-db.js';
 
 // ============================================================
 // HÀM: initCityPanel()
@@ -90,66 +91,72 @@ export function showCityPanel(polygon, countryCities, histData) {
     // --- Bước 2: Gọi API song song cho từng thành phố (async) ---
     cities.forEach(async function(city) {
       var cardId = 'city-card-' + city.name.replace(/\s+/g, '_');
+
+      var weather   = null; // { temp, cityName }
+      var pollution = null; // { aqi, pm2_5 }
+
+      // Bước 2a: Gọi OpenWeatherMap API
       try {
-        // Promise.all gọi 2 API đồng thời → nhanh hơn gọi tuần tự
-        var results   = await Promise.all([
+        var results = await Promise.all([
           getCurrentWeather(city.lat, city.lng),
           getAirPollution(city.lat, city.lng)
         ]);
-        var weather   = results[0]; // { temp, cityName }
-        var pollution = results[1]; // { aqi, pm2_5 }
+        weather   = results[0];
+        pollution = results[1];
+      } catch (e) {
+        console.warn('[CityPanel] API error for', city.name, e);
+      }
 
-        var card = document.getElementById(cardId);
-        if (!card) return; // Card có thể đã bị xoá nếu user click quốc gia khác
-
-        // Định dạng giá trị, dùng 'N/A' nếu API thất bại
-        var temp     = weather   ? weather.temp.toFixed(1)    : 'N/A';
-        var pm25     = pollution ? pollution.pm2_5.toFixed(1) : 'N/A';
-        var aqi      = pollution ? pollution.aqi              : null;
-        var aqiLabel = aqi ? AQI_LABELS[aqi] : 'N/A'; // VD: AQI=2 → 'Fair'
-        var aqiColor = aqi ? AQI_COLORS[aqi] : 'rgba(255,255,255,0.4)';
-
-        // --- Thay nội dung card loading bằng dữ liệu thực ---
-        card.innerHTML =
-          '<div class="city-card-name">' + city.name + '</div>' +
-          '<div class="city-card-stats">' +
-            // Nhiệt độ
-            '<div class="stat-item">' +
-              '<div class="stat-label">🌡 Temperature</div>' +
-              '<div class="stat-value temp">' + temp + '<span class="stat-unit"> °C</span></div>' +
-            '</div>' +
-            // PM2.5
-            '<div class="stat-item">' +
-              '<div class="stat-label">💨 PM 2.5</div>' +
-              '<div class="stat-value pm25">' + pm25 + '<span class="stat-unit"> µg/m³</span></div>' +
-            '</div>' +
-            // AQI số
-            '<div class="stat-item">' +
-              '<div class="stat-label">🏭 AQI Index</div>' +
-              '<div class="stat-value aqi aqi-' + aqi + '">' + (aqi || 'N/A') + '</div>' +
-              // CSS class aqi-1 → aqi-5 điều khiển màu sắc qua style.css
-            '</div>' +
-            // Nhãn mức AQI (Good / Fair / Moderate…)
-            '<div class="stat-item">' +
-              '<div class="stat-label">📊 Status</div>' +
-              '<div class="aqi-label" style="color:' + aqiColor + ';font-size:13px;font-weight:700;font-family:Rajdhani,sans-serif;margin-top:4px">' +
-                aqiLabel +
-              '</div>' +
-            '</div>' +
-          '</div>';
-
-      } catch(e) {
-        // Nếu fetch thất bại: hiện thông báo lỗi trong card thay vì crash app
-        console.error('[CityPanel]', city.name, e);
-        var card = document.getElementById(cardId);
-        if (card) {
-          var el = card.querySelector('.city-card-loading');
-          if (el) el.innerHTML =
-            '<span style="color:rgba(255,100,100,0.7);font-size:11px">' +
-              (e.message || e) +
-            '</span>';
+      // Bước 2b: Fallback sang Supabase cache nếu API lỗi
+      if (!weather || !pollution) {
+        try {
+          var cached = await getCachedWeather(city.lat, city.lng);
+          if (cached) {
+            if (!weather)   weather   = { temp: cached.temperature, cityName: city.name };
+            if (!pollution) pollution = { aqi: cached.aqi, pm2_5: cached.pm2_5 };
+          }
+        } catch(e2) {
+          console.warn('[CityPanel] Cache fallback error for', city.name, e2);
         }
       }
+
+      var card = document.getElementById(cardId);
+      if (!card) return;
+
+      // Định dạng giá trị, dùng 'N/A' nếu API thất bại
+      var temp     = weather   ? weather.temp.toFixed(1)    : 'N/A';
+      var pm25     = pollution ? pollution.pm2_5.toFixed(1) : 'N/A';
+      var aqi      = pollution ? pollution.aqi              : null;
+      var aqiLabel = aqi ? AQI_LABELS[aqi] : 'N/A';
+      var aqiColor = aqi ? AQI_COLORS[aqi] : 'rgba(255,255,255,0.4)';
+
+      // --- Thay nội dung card loading bằng dữ liệu thực ---
+      card.innerHTML =
+        '<div class="city-card-name">' + city.name + '</div>' +
+        '<div class="city-card-stats">' +
+          // Nhiệt độ
+          '<div class="stat-item">' +
+            '<div class="stat-label">🌡 Temperature</div>' +
+            '<div class="stat-value temp">' + temp + '<span class="stat-unit"> °C</span></div>' +
+          '</div>' +
+          // PM2.5
+          '<div class="stat-item">' +
+            '<div class="stat-label">💨 PM 2.5</div>' +
+            '<div class="stat-value pm25">' + pm25 + '<span class="stat-unit"> µg/m³</span></div>' +
+          '</div>' +
+          // AQI số
+          '<div class="stat-item">' +
+            '<div class="stat-label">🏭 AQI Index</div>' +
+            '<div class="stat-value aqi aqi-' + aqi + '">' + (aqi || 'N/A') + '</div>' +
+          '</div>' +
+          // Nhãn mức AQI (Good / Fair / Moderate…)
+          '<div class="stat-item">' +
+            '<div class="stat-label">📊 Status</div>' +
+            '<div class="aqi-label" style="color:' + aqiColor + ';font-size:13px;font-weight:700;font-family:Rajdhani,sans-serif;margin-top:4px">' +
+              aqiLabel +
+            '</div>' +
+          '</div>' +
+        '</div>';
     });
   }
 

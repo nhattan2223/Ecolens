@@ -9,6 +9,7 @@ import { GLOBAL_DATA, LAYER_YEARS, LAYER_LABELS, vietnamIslands } from './data.j
 import { buildBarChart as buildBarChartCanvas } from './chart-utils.js';
 import { initSearch } from './search.js';
 import { initCityPanel, showCityPanel, hideCityPanel } from './city-panel.js';
+import { startWeatherSync } from './weather-db.js';
 import {
   world, renderPolygons, applyGlobeTexture, applyGlobeLayout,
   resetGlobeTransform, positionTimeline, getCountryView
@@ -380,4 +381,5 @@ loadJson('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json', null)
     initSearch(allPolygons, selectCountry);         // Khởi tạo ô tìm kiếm
     initCityPanel();                                // Gắn event listener tab panel
     initGear();                                     // Gắn event listener gear button
+    startWeatherSync();                             // Bắt đầu đồng bộ weather cache (chạy nền)
   });
