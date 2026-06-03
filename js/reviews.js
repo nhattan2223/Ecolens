@@ -4,10 +4,10 @@
    ============================================================ */
 
 // ── Supabase config ──────────────────────────────────────────
-const { SUPABASE_URL, SUPABASE_KEY } = window.EcoLensApiKeys || {};
-
-// NOTE: Variable named "db" to avoid collision with the "supabase" namespace
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Use the shared auth client so RLS session is respected
+function getDb() {
+  return (window.EcoLensAuth && window.EcoLensAuth.getDb()) || null;
+}
 
 // ── State ────────────────────────────────────────────────────
 let allReviews = [];   // cache of reviews from DB
@@ -123,6 +123,9 @@ async function loadReviews() {
     </div>
   `;
 
+  const db = getDb();
+  if (!db) { grid.innerHTML = `<div style="padding:3rem;opacity:.4;grid-column:1/-1;">Database not configured.</div>`; return; }
+
   const { data, error } = await db
     .from('insights')
     .select('*')
@@ -141,6 +144,8 @@ async function loadReviews() {
 
 // ── Realtime subscription ────────────────────────────────────
 function subscribeRealtime() {
+  const db = getDb();
+  if (!db) return;
   db
     .channel('insights-realtime')
     .on(
@@ -226,6 +231,13 @@ async function submitFeedback() {
   if (!validateForm()) return;
   console.log('[Feedback] submitFeedback called');
 
+  // Auth check
+  const user = window.EcoLensAuth && window.EcoLensAuth.getUser();
+  if (!user) {
+    if (window.openAuthModal) window.openAuthModal();
+    return;
+  }
+
   const nameInput    = document.querySelector('.feedback-form-inner input[placeholder="e.g. John Doe"]');
   const orgInput     = document.querySelector('.feedback-form-inner input[placeholder="e.g. Climate Research Institute"]');
   const messageInput = document.querySelector('.form-textarea');
@@ -233,6 +245,7 @@ async function submitFeedback() {
   const submitBtn    = document.querySelector('.form-submit');
 
   const payload = {
+    user_id:   user.id,
     full_name: nameInput.value.trim() || 'Anonymous',
     org_role:  orgInput.value.trim() || null,
     rating:    ratingValue,
@@ -245,6 +258,8 @@ async function submitFeedback() {
   submitBtn.disabled = true;
   submitBtn.textContent = 'Sending…';
 
+  const db = getDb();
+  if (!db) { alert('Database not configured.'); submitBtn.disabled = false; submitBtn.textContent = 'Send Review'; return; }
   const { data, error } = await db.from('insights').insert([payload]).select();
   console.log('[Feedback] insert result:', { data, error });
 
@@ -342,6 +357,11 @@ function initializeFeedbackRating() {
 
 // ── Toggle form ──────────────────────────────────────────────
 function toggleFeedbackForm() {
+  const user = window.EcoLensAuth && window.EcoLensAuth.getUser();
+  if (!user) {
+    if (window.openAuthModal) window.openAuthModal();
+    return;
+  }
   const form = document.getElementById('feedback-form');
   if (!form) return;
   if (form.style.display === 'none' || form.style.display === '') {

@@ -1,11 +1,12 @@
-// api.js — gọi API trực tiếp từ browser (không cần proxy Node.js)
+// api.js — Gọi API qua backend proxy (giấu API key)
 
-const { OPEN_WEATHER_KEY, GNEWS_KEY } = window.EcoLensApiKeys || {};
+function getBackendUrl() {
+  return window.EcoLensApiKeys?.BACKEND_URL || 'http://localhost:3000';
+}
 
 export async function getCurrentWeather(lat, lon) {
   try {
-    if (!OPEN_WEATHER_KEY) throw new Error('Missing OPEN_WEATHER_KEY');
-    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${OPEN_WEATHER_KEY}&units=metric`;
+    const url = `${getBackendUrl()}/api/weather?lat=${lat}&lon=${lon}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
@@ -22,8 +23,7 @@ export async function getCurrentWeather(lat, lon) {
 
 export async function getAirPollution(lat, lon) {
   try {
-    if (!OPEN_WEATHER_KEY) throw new Error('Missing OPEN_WEATHER_KEY');
-    const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${OPEN_WEATHER_KEY}`;
+    const url = `${getBackendUrl()}/api/pollution?lat=${lat}&lon=${lon}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
@@ -41,9 +41,7 @@ export async function getAirPollution(lat, lon) {
 
 export async function getEnvironmentNews() {
   try {
-    if (!GNEWS_KEY) throw new Error('Missing GNEWS_KEY');
-    const query = encodeURIComponent('climate change OR environment');
-    const url = `https://gnews.io/api/v4/search?q=${query}&lang=en&max=6&apikey=${GNEWS_KEY}`;
+    const url = `${getBackendUrl()}/api/news`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();

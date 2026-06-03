@@ -1,13 +1,16 @@
 // weather-db.js — Cache thời tiết / AQI xuống Supabase (fallback khi API lỗi)
-// Mỗi 1 giờ: fetch toàn bộ 613 thành phố với batch 15 city/lần, cách nhau 30s
-// để không vượt quá 60 calls/phút của OpenWeatherMap free plan.
+// Gọi backend proxy để giấu API key
 
-const { SUPABASE_URL, SUPABASE_KEY } = window.EcoLensApiKeys || {};
+const { SUPABASE_URL, SUPABASE_KEY, BACKEND_URL } = window.EcoLensApiKeys || {};
 const weatherDb = SUPABASE_URL && SUPABASE_KEY
   ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
   : null;
 
 let refreshTimer = null;
+
+function backendUrl() {
+  return BACKEND_URL || 'http://localhost:3000';
+}
 
 async function loadCities() {
   const res = await fetch('data/country.json');
@@ -30,41 +33,14 @@ function flattenCities(entries) {
   return all;
 }
 
-async function fetchCityData(city) {
-  const key = window.EcoLensApiKeys?.OPEN_WEATHER_KEY;
-  if (!key) throw new Error('Missing OPEN_WEATHER_KEY');
-
-  const [weatherRes, pollutionRes] = await Promise.all([
-    fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lng}&appid=${key}&units=metric`),
-    fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${city.lat}&lon=${city.lng}&appid=${key}`)
-  ]);
-
-  if (!weatherRes.ok) throw new Error(`Weather HTTP ${weatherRes.status}`);
-  if (!pollutionRes.ok) throw new Error(`Pollution HTTP ${pollutionRes.status}`);
-
-  const w = await weatherRes.json();
-  const p = await pollutionRes.json();
-
-  return {
-    city_name: city.name,
-    country: city.country,
-    lat: city.lat,
-    lng: city.lng,
-    temperature: w.main?.temp ?? null,
-    pm2_5: p.list?.[0]?.components?.pm2_5 ?? null,
-    aqi: p.list?.[0]?.main?.aqi ?? null,
-    updated_at: new Date().toISOString()
-  };
-}
-
-// ── Gọi API cho tất cả thành phố, theo batch để tránh rate limit ──
+// ── Gọi API qua backend proxy, theo batch ──
 export async function refreshAllCities() {
   if (!weatherDb) {
     console.warn('[WeatherDB] Supabase not available');
     return;
   }
 
-  console.log('[WeatherDB] Fetching all cities…');
+  console.log('[WeatherDB] Fetching all cities via proxy…');
 
   let entries;
   try {
@@ -83,31 +59,34 @@ export async function refreshAllCities() {
   for (let i = 0; i < allCities.length; i += BATCH_SIZE) {
     const batch = allCities.slice(i, i + BATCH_SIZE);
 
-    const results = await Promise.allSettled(
-      batch.map(c => fetchCityData(c))
-    );
+    try {
+      const res = await fetch(`${backendUrl()}/api/weather-batch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cities: batch })
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const result = await res.json();
 
-    const rows = [];
-    for (const r of results) {
-      if (r.status === 'fulfilled' && r.value) rows.push(r.value);
-    }
-
-    if (rows.length > 0) {
-      const deduped = [];
-      const seen = new Set();
-      for (const r of rows) {
-        const key = `${r.lat},${r.lng}`;
-        if (!seen.has(key)) {
-          seen.add(key);
-          deduped.push(r);
+      if (result.rows && result.rows.length > 0) {
+        const deduped = [];
+        const seen = new Set();
+        for (const r of result.rows) {
+          const key = `${r.lat},${r.lng}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            deduped.push(r);
+          }
         }
+
+        const { error } = await weatherDb
+          .from('city_weather')
+          .upsert(deduped, { onConflict: 'lat,lng' });
+
+        if (error) console.warn('[WeatherDB] Upsert error:', JSON.stringify(error));
       }
-
-      const { error } = await weatherDb
-        .from('city_weather')
-        .upsert(deduped, { onConflict: 'lat,lng' });
-
-      if (error) console.warn('[WeatherDB] Upsert error:', JSON.stringify(error));
+    } catch (err) {
+      console.warn('[WeatherDB] Batch error:', err.message);
     }
 
     done += batch.length;

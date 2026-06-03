@@ -1,3 +1,15 @@
+/* ===================== AUTH MODAL ===================== */
+.auth-overlay { animation: authFadeIn .2s ease; }
+@keyframes authFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.auth-modal { animation: authSlideUp .3s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes authSlideUp { from { opacity: 0; transform: translateY(24px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.auth-input:focus { border-color: #34d399 !important; }
+.auth-submit:hover { background: #10b981 !important; }
+.auth-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+.auth-btn svg { transition: transform .2s; }
+.auth-btn:hover svg { transform: translateX(3px); }
+
 * { margin:0; padding:0; box-sizing:border-box; }
 body { background:#000; overflow:hidden; font-family:var(--eco-globe-font, 'Rajdhani', sans-serif); --highlight-color:#8cff7a; --highlight-color-strong:rgba(140,255,122,1); --highlight-color-soft:rgba(140,255,122,0.18); }
 
