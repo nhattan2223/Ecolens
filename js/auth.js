@@ -24,11 +24,17 @@ function dispatchAuthEvent(type, user) {
 }
 
 // ── Auth actions ─────────────────────────────────────────────
+function getBaseUrl() {
+  const path = window.location.pathname;
+  const base = path.endsWith('.html') ? path.substring(0, path.lastIndexOf('/')) : path;
+  return window.location.origin + (base.endsWith('/') ? base.slice(0, -1) : base);
+}
+
 async function handleSignup(email, password) {
   const { data, error } = await authDb.auth.signUp({
     email,
     password,
-    options: { emailRedirectTo: window.location.origin }
+    options: { emailRedirectTo: getBaseUrl() }
   });
   if (error) throw error;
   return data;
@@ -52,7 +58,7 @@ async function handleSignout() {
 
 async function handleResetPassword(email) {
   const { error } = await authDb.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin
+    redirectTo: getBaseUrl()
   });
   if (error) throw error;
 }
@@ -180,6 +186,21 @@ function buildAuthModal() {
         <div class="auth-error" style="color:#f87171;font-size:12px;margin-top:.75rem;display:none;"></div>
         <div class="auth-success" style="color:#34d399;font-size:12px;margin-top:.75rem;display:none;"></div>
         <button type="button" class="auth-back-btn" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:10px;cursor:pointer;margin-top:1rem;display:block;width:100%;text-align:center;text-transform:uppercase;letter-spacing:.15em;">&larr; Back to Sign In</button>
+      </form>
+
+      <!-- Reset Password Form (hiện sau khi click link trong email) -->
+      <form class="auth-form" id="auth-reset-form" style="display:none;" onsubmit="return false;">
+        <div style="margin-bottom:0.5rem;">
+          <label style="font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,.4);display:block;margin-bottom:.5rem;">New Password</label>
+          <input type="password" class="auth-input" placeholder="Min. 6 characters" required minlength="6" style="width:100%;padding:.85rem 1rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:14px;outline:none;transition:border-color .2s;">
+        </div>
+        <div style="margin-bottom:1.5rem;">
+          <label style="font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,.4);display:block;margin-bottom:.5rem;">Confirm New Password</label>
+          <input type="password" class="auth-input" placeholder="Repeat password" required minlength="6" style="width:100%;padding:.85rem 1rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:14px;outline:none;transition:border-color .2s;">
+        </div>
+        <button type="submit" class="auth-submit" style="width:100%;padding:1rem;background:#059669;border:none;border-radius:12px;color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:.2em;font-weight:700;cursor:pointer;transition:background .2s;">Update Password</button>
+        <div class="auth-error" style="color:#f87171;font-size:12px;margin-top:.75rem;display:none;"></div>
+        <div class="auth-success" style="color:#34d399;font-size:12px;margin-top:.75rem;display:none;"></div>
       </form>
 
       <!-- Sign Up Form -->
@@ -344,6 +365,46 @@ function buildAuthModal() {
     }
   });
 
+  // Reset password submit
+  overlay.querySelector('#auth-reset-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const pw = form.querySelectorAll('input[type="password"]')[0].value;
+    const confirm = form.querySelectorAll('input[type="password"]')[1].value;
+    const errEl = form.querySelector('.auth-error');
+    const successEl = form.querySelector('.auth-success');
+
+    errEl.style.display = 'none';
+    successEl.style.display = 'none';
+
+    if (pw !== confirm) {
+      errEl.textContent = 'Passwords do not match';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const btn = form.querySelector('.auth-submit');
+    btn.textContent = 'Updating…';
+    btn.disabled = true;
+
+    try {
+      const { error } = await authDb.auth.updateUser({ password: pw });
+      if (error) throw error;
+      successEl.textContent = 'Password updated! Redirecting…';
+      successEl.style.display = 'block';
+      btn.textContent = 'Done';
+      setTimeout(() => {
+        closeAuthModal();
+        authDb.auth.signOut();
+      }, 2000);
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.style.display = 'block';
+      btn.textContent = 'Update Password';
+      btn.disabled = false;
+    }
+  });
+
   // Close on overlay click
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) closeAuthModal();
@@ -368,6 +429,18 @@ window.closeAuthModal = closeAuthModal;
 // ── Listen for auth state changes ────────────────────────────
 authDb.auth.onAuthStateChange((event, session) => {
   currentUser = session?.user ?? null;
+
+  if (event === 'PASSWORD_RECOVERY') {
+    // User clicked reset link in email → show reset password form
+    if (!authModalEl) buildAuthModal();
+    authModalEl.querySelectorAll('.auth-form').forEach(f => f.style.display = 'none');
+    authModalEl.querySelectorAll('.auth-error').forEach(e => e.style.display = 'none');
+    authModalEl.querySelectorAll('.auth-success').forEach(e => e.style.display = 'none');
+    authModalEl.querySelector('#auth-reset-form').style.display = 'block';
+    authModalEl.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
   renderAuthUI();
   dispatchAuthEvent(event, currentUser);
 });
