@@ -94,6 +94,7 @@ export function showCityPanel(polygon, countryCities, histData) {
 
       var weather   = null; // { temp, cityName }
       var pollution = null; // { aqi, pm2_5 }
+      var source    = 'API';
 
       // Bước 2a: Gọi OpenWeatherMap API
       try {
@@ -109,6 +110,7 @@ export function showCityPanel(polygon, countryCities, histData) {
 
       // Bước 2b: Fallback sang Supabase cache nếu API lỗi
       if (!weather || !pollution) {
+        source = 'Supabase cache';
         try {
           var cached = await getCachedWeather(city.lat, city.lng);
           if (cached) {
@@ -133,6 +135,7 @@ export function showCityPanel(polygon, countryCities, histData) {
       // --- Thay nội dung card loading bằng dữ liệu thực ---
       card.innerHTML =
         '<div class="city-card-name">' + city.name + '</div>' +
+        '<div style="font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:' + (source === 'API' ? 'rgba(140,255,122,.7)' : 'rgba(255,200,100,.7)') + ';margin-bottom:6px;">Source: ' + source + '</div>' +
         '<div class="city-card-stats">' +
           // Nhiệt độ
           '<div class="stat-item">' +
