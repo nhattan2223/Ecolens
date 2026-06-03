@@ -25,9 +25,10 @@ function dispatchAuthEvent(type, user) {
 
 // ── Auth actions ─────────────────────────────────────────────
 function getBaseUrl() {
-  const path = window.location.pathname;
-  const base = path.endsWith('.html') ? path.substring(0, path.lastIndexOf('/')) : path;
-  return window.location.origin + (base.endsWith('/') ? base.slice(0, -1) : base);
+  let path = window.location.pathname;
+  if (path.endsWith('.html')) path = path.substring(0, path.lastIndexOf('/') + 1);
+  if (!path.endsWith('/')) path += '/';
+  return window.location.origin + path;
 }
 
 async function handleSignup(email, password) {
