@@ -28,11 +28,11 @@ async function loadJson(url, fallback) {
   }
 }
 
-loadJson('../data/country.json', [])
+loadJson('data/country.json', [])
   .then(d => { COUNTRY_CITIES = d; }); // Gán vào biến khi tải xong
 
 let HIST_DATA = {}; // Dữ liệu lịch sử: { "VNM": { temp:{}, pm25:{}, forest:{} }, … }
-loadJson('../data/historical_data.json', {})
+loadJson('data/historical_data.json', {})
   .then(d => { HIST_DATA = d; });
 
 // ── TRẠNG THÁI TOÀN CỤC ─────────────────────────────────────
