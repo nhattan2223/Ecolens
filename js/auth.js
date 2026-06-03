@@ -8,12 +8,33 @@ const authDb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser = null;
 let authModalEl = null;
+let passwordRecoveryPending = false;
 
 // ── Session ─────────────────────────────────────────────────
 async function initSession() {
   const { data: { session } } = await authDb.auth.getSession();
   currentUser = session?.user ?? null;
+
+  // Kiểm tra password recovery (từ URL hash hoặc event đã miss)
+  if (passwordRecoveryPending || (window.location.hash && window.location.hash.includes('type=recovery'))) {
+    showResetPasswordModal();
+    passwordRecoveryPending = false;
+  }
+
   renderAuthUI();
+}
+
+function showResetPasswordModal() {
+  if (!authModalEl) buildAuthModal();
+  const tabs = authModalEl.querySelector('#auth-tabs');
+  const heading = authModalEl.querySelector('#auth-reset-heading');
+  if (tabs) tabs.style.display = 'none';
+  if (heading) heading.style.display = 'block';
+  authModalEl.querySelectorAll('.auth-form').forEach(f => f.style.display = 'none');
+  const form = authModalEl.querySelector('#auth-reset-form');
+  if (form) form.style.display = 'block';
+  authModalEl.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 
 // ── Event helpers ────────────────────────────────────────────
@@ -440,15 +461,7 @@ authDb.auth.onAuthStateChange((event, session) => {
   currentUser = session?.user ?? null;
 
   if (event === 'PASSWORD_RECOVERY') {
-    if (!authModalEl) buildAuthModal();
-    authModalEl.querySelectorAll('.auth-form').forEach(f => f.style.display = 'none');
-    authModalEl.querySelectorAll('.auth-error').forEach(e => e.style.display = 'none');
-    authModalEl.querySelectorAll('.auth-success').forEach(e => e.style.display = 'none');
-    authModalEl.querySelector('#auth-tabs').style.display = 'none';
-    authModalEl.querySelector('#auth-reset-heading').style.display = 'block';
-    authModalEl.querySelector('#auth-reset-form').style.display = 'block';
-    authModalEl.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+    passwordRecoveryPending = true;
   }
 
   renderAuthUI();
