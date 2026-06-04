@@ -513,3 +513,51 @@ body.country-active #gear-wrapper { opacity:0; pointer-events:none; }
     #live-section {
       max-height: calc(100vh - var(--nav-h) - 40px - 180px) !important;
     }
+
+/* ── Eco Score Legend ── */
+#eco-legend {
+  position: fixed;
+  bottom: 30px;
+  right: 24px;
+  z-index: 110;
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px 12px;
+  pointer-events: none;
+  font-family: 'Rajdhani', sans-serif;
+}
+#eco-legend.visible { display: flex; }
+.eco-legend-bar {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.eco-legend-segment { flex: 1; }
+.eco-legend-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 6px;
+}
+.eco-legend-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.8);
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 500;
+}
+.eco-legend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}

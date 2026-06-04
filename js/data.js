@@ -73,6 +73,7 @@ export const LAYER_LABELS = {
   temperature: '\ud83c\udf21\ufe0f Temperature',
   pm25       : '\ud83d\udca8 PM 2.5',
   forest     : '\ud83c\udf33 Forest Area',
+  eco_score  : '\ud83c\udf0d Risk Scale',
 };
 
 // ============================================================

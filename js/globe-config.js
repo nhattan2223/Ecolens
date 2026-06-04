@@ -45,16 +45,26 @@ world.controls().autoRotateSpeed = 0.5;
 //   isVietnamSelected  – hàm() trả về true nếu VN đang được chọn
 //   onPolygonClick     – callback khi người dùng click vào polygon
 // ─────────────────────────────────────────────────────────────
-export function renderPolygons(allPolygons, selectedCountry, isVietnamSelected, onPolygonClick) {
-  world
-    .polygonsData(allPolygons) // Cung cấp dữ liệu GeoJSON cho Globe.gl
+export function renderPolygons(allPolygons, selectedCountry, isVietnamSelected, onPolygonClick, ecoScores) {
+  function ecoColor(nri) {
+    if (nri == null) return 'rgba(255,255,255,0.04)';
+    if (nri < 1)     return 'rgba(139,195,74,0.35)';
+    if (nri < 4)     return 'rgba(46,125,50,0.4)';
+    if (nri < 9)     return 'rgba(255,193,7,0.45)';
+    if (nri < 16)    return 'rgba(244,67,54,0.5)';
+    return 'rgba(123,31,162,0.55)';
+  }
 
-    // --- Màu mặt trên polygon (cap = mặt nhìn từ không gian) ---
-    // Arrow function nhận từng polygon d, trả về màu RGBA string
+  world
+    .polygonsData(allPolygons)
+
     .polygonCapColor(d => {
+      if (ecoScores) {
+        return ecoColor(ecoScores[d.properties.name]);
+      }
       if (isVietnamIsland(d))    return isVietnamSelected() ? 'rgba(140,255,122,0.15)' : 'rgba(255,255,255,0.05)';
-      if (d === selectedCountry) return 'rgba(140,255,122,0.15)'; // Green mờ nếu đang chọn
-      return 'rgba(255,255,255,0.05)';  // Trắng rất mờ cho các quốc gia khác
+      if (d === selectedCountry) return 'rgba(140,255,122,0.15)';
+      return 'rgba(255,255,255,0.05)';
     })
 
     // --- Màu cạnh bên polygon (side = chiều dày khi polygon nhô lên) ---

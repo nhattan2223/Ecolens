@@ -9,11 +9,15 @@ import { GLOBAL_DATA, LAYER_YEARS, LAYER_LABELS, vietnamIslands } from './data.j
 import { buildBarChart as buildBarChartCanvas } from './chart-utils.js';
 import { initSearch } from './search.js';
 import { initCityPanel, showCityPanel, hideCityPanel } from './city-panel.js';
-import { startWeatherSync } from './weather-db.js';
 import {
   world, renderPolygons, applyGlobeTexture, applyGlobeLayout,
   resetGlobeTransform, positionTimeline, getCountryView
 } from './globe-config.js';
+
+const { SUPABASE_URL, SUPABASE_KEY } = window.EcoLensApiKeys || {};
+const supabase = window.supabase && SUPABASE_URL && SUPABASE_KEY
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+  : null;
 
 // ── TẢI DỮ LIỆU NGOÀI ──────────────────────────────────────
 // Fetch song song 2 file JSON (chạy không chặn UI)
@@ -36,6 +40,16 @@ let HIST_DATA = {}; // Dữ liệu lịch sử: { "VNM": { temp:{}, pm25:{}, for
 loadJson('data/historical_data.json', {})
   .then(d => { HIST_DATA = d; });
 
+let ecoScoresMap = null;
+async function loadEcoScores() {
+  if (!supabase) return;
+  const { data } = await supabase.from('country_eco_scores').select('country, nri');
+  if (data) {
+    ecoScoresMap = {};
+    data.forEach(row => { ecoScoresMap[row.country] = row.nri; });
+  }
+}
+
 // ── TRẠNG THÁI TOÀN CỤC ─────────────────────────────────────
 let selectedCountry      = null;  // GeoJSON Feature đang được chọn (null = chưa chọn)
 let allPolygons          = [];    // Toàn bộ polygon quốc gia + đảo VN
@@ -55,7 +69,7 @@ function isVietnamSelected() {
 
 // Tái vẽ tất cả polygon với trạng thái hiện tại (selectedCountry, isVietnamSelected)
 function _renderPolygons() {
-  renderPolygons(allPolygons, selectedCountry, isVietnamSelected, selectCountry);
+  renderPolygons(allPolygons, selectedCountry, isVietnamSelected, selectCountry, ecoScoresMap);
 }
 
 // ============================================================
@@ -157,21 +171,40 @@ function setActiveLayer(layer) {
     // ─ TẮT layer hiện tại ─
     activeLayer = null;
     activeYear  = null;
+    ecoScoresMap = null;
     document.querySelectorAll('.layer-btn').forEach(b => b.classList.remove('active'));
     hideTimeline();
     hideBadge();
     hideInfoPanel();
-    document.body.classList.remove('layer-active'); // CSS dùng class này để ẩn search bar
+    document.body.classList.remove('layer-active');
     applyGlobeLayout(selectedCountry, null);
-    applyGlobeTexture(null, null); // Trả về texture mặc định
+    applyGlobeTexture(null, null);
+    hideEcoLegend();
+    _renderPolygons();
+
+  } else if (layer === 'eco_score') {
+    // ─ BẬT Eco Score ─
+    activeLayer = layer;
+    activeYear = null;
+    document.querySelectorAll('.layer-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.layer === layer)
+    );
+    hideTimeline();
+    hideInfoPanel();
+    showBadge(layer);
+    applyGlobeTexture(null, null);
+    applyGlobeLayout(selectedCountry, null);
+    showEcoLegend();
+    loadEcoScores().then(() => _renderPolygons());
 
   } else {
     // ─ BẬT layer mới ─
+    hideEcoLegend();
     activeLayer = layer;
-    const years = LAYER_YEARS[layer]; // Danh sách năm của layer này
-    activeYear  = years[0];           // Mặc định chọn năm đầu tiên
+    const years = LAYER_YEARS[layer];
+    activeYear  = years[0];
+    ecoScoresMap = null;
 
-    // Cập nhật UI: button active, timeline, badge, info panel
     document.querySelectorAll('.layer-btn').forEach(b =>
       b.classList.toggle('active', b.dataset.layer === layer)
     );
@@ -181,7 +214,7 @@ function setActiveLayer(layer) {
     showInfoPanel(layer);
     document.body.classList.add('layer-active');
     applyGlobeLayout(selectedCountry, layer);
-    applyGlobeTexture(layer, activeYear); // Áp texture đầu tiên của layer
+    applyGlobeTexture(layer, activeYear);
   }
 }
 
@@ -194,6 +227,15 @@ function showTimeline() {
 }
 function hideTimeline() {
   document.getElementById('timeline-wrapper').classList.remove('visible');
+}
+
+function showEcoLegend() {
+  const el = document.getElementById('eco-legend');
+  if (el) el.classList.add('visible');
+}
+function hideEcoLegend() {
+  const el = document.getElementById('eco-legend');
+  if (el) el.classList.remove('visible');
 }
 
 // Hiển thị badge (nhãn layer đang bật ở góc trên trái)
@@ -295,8 +337,7 @@ function initGear() {
 // SELECT COUNTRY — Xử lý khi người dùng click vào một quốc gia
 // ============================================================
 function selectCountry(polygon) {
-  // Nếu đang bật layer → không cho chọn quốc gia (2 chế độ loại trừ nhau)
-  if (activeLayer) return;
+  if (activeLayer && activeLayer !== 'eco_score') return;
 
   selectedCountry      = polygon;
   _justSelectedCountry = true; // Đặt flag để ngăn globe click handler chạy ngay
@@ -350,8 +391,8 @@ function resetGlobe() {
 
 // ── SỰ KIỆN: Click vào globe (không phải polygon) → Reset ──
 world.onGlobeClick(() => {
-  if (activeLayer) return;            // Đang bật layer → bỏ qua
-  if (!_justSelectedCountry) resetGlobe(); // Flag ngăn reset ngay sau khi click polygon
+  if (activeLayer && activeLayer !== 'eco_score') return;
+  if (!_justSelectedCountry) resetGlobe();
 });
 
 // ── SỰ KIỆN: Resize cửa sổ ──
@@ -381,5 +422,5 @@ loadJson('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json', null)
     initSearch(allPolygons, selectCountry);         // Khởi tạo ô tìm kiếm
     initCityPanel();                                // Gắn event listener tab panel
     initGear();                                     // Gắn event listener gear button
-    startWeatherSync();                             // Bắt đầu đồng bộ weather cache (chạy nền)
+
   });
