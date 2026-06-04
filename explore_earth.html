@@ -13,6 +13,30 @@
   <!-- Globe styles (Rajdhani, globe UI) -->
   <link rel="stylesheet" href="style.css">
 
+  <!-- Preload key resources -->
+  <link rel="preload" href="https://unpkg.com/globe.gl" as="script">
+  <link rel="preload" href="https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg" as="image" crossorigin="anonymous">
+  <link rel="preload" href="https://unpkg.com/three-globe/example/img/earth-topology.png" as="image" crossorigin="anonymous">
+
+  <!-- Loading indicator styles -->
+  <style>
+    #globe-loading {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      z-index: 9999; text-align: center; pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    #globe-loading.hidden { opacity: 0; }
+    #globe-loading .spinner {
+      width: 48px; height: 48px; border: 3px solid rgba(140,255,122,0.15);
+      border-top-color: #8cff7a; border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #globe-loading .text {
+      font-family: 'Rajdhani', sans-serif; font-size: 14px;
+      color: rgba(140,255,122,0.7); letter-spacing: 2px; text-transform: uppercase;
+    }
+  </style>
 </head>
 <body class="explore-earth-page">
 
@@ -70,6 +94,10 @@
        GLOBE UI (nguyên bản từ explore_earth.html)
   ══════════════════════════════════════════════ -->
   <div id="globe-container"></div>
+  <div id="globe-loading">
+    <div class="spinner"></div>
+    <div class="text">Loading Globe...</div>
+  </div>
 
   <!-- Search -->
   <div id="search-wrapper">

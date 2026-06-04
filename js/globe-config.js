@@ -22,6 +22,10 @@ export const world = Globe()
   .globeImageUrl(BASE_TEXTURE)
   .bumpImageUrl(BASE_BUMP)
   .backgroundColor('#000000')
+  .onGlobeReady(function() {
+    var el = document.getElementById('globe-loading');
+    if (el) el.classList.add('hidden');
+  })
   (globeEl);
 
 // Đặt góc nhìn ban đầu: altitude=1.4 (xa vừa đủ thấy toàn cầu)
