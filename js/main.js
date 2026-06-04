@@ -215,6 +215,7 @@ function setActiveLayer(layer) {
     document.body.classList.add('layer-active');
     applyGlobeLayout(selectedCountry, layer);
     applyGlobeTexture(layer, activeYear);
+    _renderPolygons();
   }
 }
 
