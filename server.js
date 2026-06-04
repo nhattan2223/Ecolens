@@ -155,7 +155,6 @@ async function refreshAllCities() {
   console.log(`[Server] Weather sync done — ${done} cities`);
 }
 
-refreshAllCities();
 setInterval(refreshAllCities, 7200000);
 
 // ── Eco Score: tính NRI từ city_weather, chạy mỗi 2.5 giờ ──
@@ -222,4 +221,7 @@ app.listen(PORT, () => {
     try { await fetch(PING_URL); } catch {}
   }, 600000);
   console.log(`  Self-ping every 10m at ${PING_URL}`);
+
+  // Chạy weather sync đầu tiên sau 30 giây (khi server đã ổn định)
+  setTimeout(refreshAllCities, 30000);
 });
