@@ -215,4 +215,11 @@ app.listen(PORT, () => {
   if (!OWM_KEY) console.warn('  WARN: OPEN_WEATHER_KEY not set');
   if (!GNEWS_KEY) console.warn('  WARN: GNEWS_KEY not set');
   if (!SUPABASE) console.warn('  WARN: Supabase not configured');
+
+  // Tự ping mỗi 10 phút để Render không ngủ
+  const PING_URL = `http://localhost:${PORT}/api/health`;
+  setInterval(async () => {
+    try { await fetch(PING_URL); } catch {}
+  }, 600000);
+  console.log(`  Self-ping every 10m at ${PING_URL}`);
 });
