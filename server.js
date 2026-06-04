@@ -215,12 +215,12 @@ app.listen(PORT, () => {
   if (!GNEWS_KEY) console.warn('  WARN: GNEWS_KEY not set');
   if (!SUPABASE) console.warn('  WARN: Supabase not configured');
 
-  // Tự ping mỗi 10 phút để Render không ngủ
-  const PING_URL = `http://localhost:${PORT}/api/health`;
+  // Tự ping mỗi 5 phút để Render không ngủ
+  const PING_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
   setInterval(async () => {
-    try { await fetch(PING_URL); } catch {}
-  }, 600000);
-  console.log(`  Self-ping every 10m at ${PING_URL}`);
+    try { await fetch(`${PING_URL}/api/health`); } catch {}
+  }, 300000);
+  console.log(`  Self-ping every 5m at ${PING_URL}/api/health`);
 
   // Chạy weather sync đầu tiên sau 30 giây (khi server đã ổn định)
   setTimeout(refreshAllCities, 30000);
