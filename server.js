@@ -198,10 +198,10 @@ async function calculateEcoScores() {
   }
 }
 
-// Eco score: lần đầu sau 30 phút, sau đó mỗi 2.5 giờ
+// Eco score: lần đầu sau 30 phút, sau đó mỗi 2 giờ (cùng chu kỳ weather sync)
 setTimeout(() => {
   calculateEcoScores();
-  setInterval(calculateEcoScores, 9000000);
+  setInterval(calculateEcoScores, 7200000);
 }, 1800000);
 
 // ── Health check ───────────────────────────────────────────
