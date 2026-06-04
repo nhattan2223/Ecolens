@@ -22,6 +22,7 @@ const ALLOWED_ORIGINS = [
   'http://localhost:3000',
   'http://localhost:5500',
   'https://itstunglam.github.io',
+  'https://nhattan2223.github.io',
 ];
 
 app.use((req, res, next) => {
