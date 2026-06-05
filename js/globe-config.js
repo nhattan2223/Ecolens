@@ -48,7 +48,7 @@ world.controls().autoRotateSpeed = 0.5;
 export function renderPolygons(allPolygons, selectedCountry, isVietnamSelected, onPolygonClick, ecoScores) {
   function ecoColor(nri) {
     if (nri == null) return 'rgba(255,255,255,0.04)';
-    if (nri < 1)     return 'rgba(139,195,74,0.35)';
+    if (nri <= 1)    return 'rgba(139,195,74,0.35)';
     if (nri < 4)     return 'rgba(46,125,50,0.4)';
     if (nri < 9)     return 'rgba(255,193,7,0.45)';
     if (nri < 16)    return 'rgba(244,67,54,0.5)';
