@@ -13,12 +13,12 @@ Compute the baseline risk levels for Temperature and $\text{PM}_{2.5}$ based on 
 ### 1. Fine Particulate Matter ($\text{PM}_{2.5}$) Risk
 Based on the WHO standard threshold of 25 $\mu\text{g/m}^3$.
 
-$$R_{PM2.5} = \left(\frac{PM_{2.5}}{25}\right)^{1.5}$$
+$$R_{\text{PM}_{2.5}} = \left(\frac{\text{PM}_{2.5}}{25}\right)^{1.5}$$
 
 ### 2. Temperature Risk
 Based on the biologically ideal temperature of 22°C.
 
-$$R_{Temp} = \left(\frac{|T - 22|}{10}\right)^2$$
+$$R_{\text{Temp}} = \left(\frac{|T - 22|}{10}\right)^2$$
 
 ---
 
@@ -26,11 +26,11 @@ $$R_{Temp} = \left(\frac{|T - 22|}{10}\right)^2$$
 
 Combines the AQI amplification factor and a protection floor (Risk Floor) to calculate the composite score for a specific city.
 
-$$CRS = \max \left[ \left( \max(R_{PM2.5}, R_{Temp}) \times (1 + 0.15 \times (AQI - 1)) \right), (AQI)^2 \right]$$
+$$CRS = \max \left[ \left( \max(R_{\text{PM}_{2.5}},\ R_{\text{Temp}}) \times (1 + 0.15 \times (\text{AQI} - 1)) \right),\ \text{AQI}^2 \right]$$
 
 ### Operational Logic
-* **Amplification:** The system identifies the maximum risk between Temperature and $\text{PM}_{2.5}$, then applies an amplification factor of up to 60% based on the overall AQI severity (scaled from 1 to 5).
-* **Safety Floor:** If both $\text{PM}_{2.5}$ and Temperature are perfectly safe ($R = 0$) but an alternative toxic gas leak drives the AQI up to 5, the outer $\max$ function activates, setting the safety floor to $5^2 = 25$ points. This prevents catastrophic edge cases from being ignored.
+* **Amplification:** The system identifies the maximum risk between Temperature and $\text{PM}_{2.5}$, then applies an amplification factor of up to 60% based on the overall AQI severity (scaled from 1 to 5). At AQI = 5: multiplier = $1 + 0.15 \times (5 - 1) = 1.60$ (+60%).
+* **Safety Floor:** If both $\text{PM}_{2.5}$ and Temperature are perfectly safe ($R = 0$) but an alternative toxic gas leak drives the AQI up, the outer $\max$ function activates, setting the safety floor to $\text{AQI}^2$. For example, at AQI = 5, the floor becomes $5^2 = 25$ points. This prevents catastrophic edge cases from being ignored.
 
 ---
 
@@ -58,4 +58,5 @@ Since this is an open-ended scale (unbounded growth), you can map the NRI to spe
 | **Over 16** | Environmental Disaster | Dark Red / Purple | Blinking / Pulsing animation effect |
 
 ---
-*Document Version: 1.0.0* *Target System: EcoLens Backend & Frontend Integration* 
+
+*Document Version: 1.0.0* | *Target System: EcoLens Backend & Frontend Integration*
