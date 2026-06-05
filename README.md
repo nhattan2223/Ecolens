@@ -118,7 +118,7 @@ http://localhost:3000/
 2. For each city → **CRS** = `max( max(R_PM2.5, R_Temp) × (1 + 0.15×(AQI-1)), AQI² )`
 3. For each country → **NRI** = RMS of top 3 CRS values
 4. Globe polygons are colored by NRI:
-   - **< 1** — Ideal (light green)
+   - **<= 1** — Ideal (light green)
    - **1–4** — Low (dark green)
    - **4–9** — Moderate (yellow)
    - **9–16** — Alarm (red)
