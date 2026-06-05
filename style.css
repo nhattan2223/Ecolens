@@ -101,6 +101,8 @@ body.country-active #gear-wrapper { opacity:0; pointer-events:none; }
 .layer-btn:nth-child(1){ transition-delay:0s; }
 .layer-btn:nth-child(2){ transition-delay:0.05s; }
 .layer-btn:nth-child(3){ transition-delay:0.1s; }
+.layer-btn:nth-child(4){ transition-delay:0.15s; }
+.layer-btn:nth-child(5){ transition-delay:0.2s; }
 
 /* ── Timeline ── */
 #timeline-wrapper {
@@ -507,6 +509,13 @@ body.country-active #gear-wrapper { opacity:0; pointer-events:none; }
       height: calc(100vh - var(--nav-h) - 40px) !important;
     }
     #city-panel-inner {
+      max-height: calc(100vh - var(--nav-h) - 40px - 48px) !important;
+    }
+    #event-panel {
+      top: var(--nav-h) !important;
+      height: calc(100vh - var(--nav-h) - 40px) !important;
+    }
+    #event-panel-inner {
       max-height: calc(100vh - var(--nav-h) - 40px - 48px) !important;
     }
     #history-section,

@@ -138,18 +138,17 @@ export function applyGlobeTexture(activeLayer, activeYear) {
 // ─────────────────────────────────────────────────────────────
 var _layoutTimer = null; // Timer để trì hoãn repositionTimeline sau animation
 
-export function applyGlobeLayout(selectedCountry, activeLayer) {
-  if (selectedCountry) {
-    // Trường hợp 1: Dịch trái để city panel xuất hiện bên phải
+export function applyGlobeLayout(selectedCountry, activeLayer, selectedEvent) {
+  if (selectedCountry || selectedEvent) {
+    // Trường hợp 1: Dịch trái để city panel / event panel xuất hiện bên phải
     globeEl.style.transition = 'transform 0.8s ease';
     globeEl.style.transform  = 'translateX(-180px)';
-    _positionTimeline(1.0); // Timeline ở vị trí mặc định (không thu nhỏ)
+    _positionTimeline(1.0);
 
-  } else if (activeLayer) {
+  } else if (activeLayer && activeLayer !== 'eco_event') {
     // Trường hợp 2: Thu nhỏ + dịch trái để info panel hiện bên phải
     globeEl.style.transition = 'transform 0.6s ease';
     globeEl.style.transform  = 'translateX(-20vw) scale(0.88)';
-    // Đợi animation xong (650ms) rồi mới căn timeline theo scale mới
     clearTimeout(_layoutTimer);
     _layoutTimer = setTimeout(function(){ _positionTimeline(0.88); }, 650);
 
