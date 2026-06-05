@@ -1,0 +1,225 @@
+================================================================================
+  TỔNG HỢP CÔNG NGHỆ & LOGIC CỐT LÕI DỰ ÁN EcoLens (earth-3d)
+================================================================================
+
+1. TỔNG QUAN
+--------------------------------------------------------------------------------
+- Tên dự án: EcoLens - Earth 3D Environmental Visualization
+- Mô tả: Web app tương tác trực quan hóa dữ liệu môi trường Trái Đất trên
+  quả địa cầu 3D. Cho phép người dùng khám phá thời tiết, chất lượng không khí,
+  lớp dữ liệu lịch sử (nhiệt độ, PM2.5, rừng), sự kiện môi trường, chỉ số rủi ro
+  quốc gia (NRI), tin tức môi trường.
+- Năm khởi tạo: 2026
+
+
+2. CÔNG NGHỆ SỬ DỤNG
+--------------------------------------------------------------------------------
+2.1. Frontend (Client)
+  - Globe.gl (CDN unpkg)    : Engine 3D globe (dựng trên Three.js)
+  - Three.js (qua Globe.gl)  : WebGL rendering
+  - D3.js v7 (CDN)           : Xử lý GeoJSON, tọa độ địa lý
+  - TopoJSON Client v3 (CDN) : Chuyển TopoJSON -> GeoJSON
+  - Supabase JS Client v2    : Database, Auth, Realtime
+  - Chart.js v4.4.7 (CDN)    : Vẽ biểu đồ cột (thay thế Canvas thuần)
+  - HTML5 / CSS3             : DOM, CSS custom properties, animations
+  - ES Modules               : Hệ thống module JavaScript
+
+2.2. Backend (Server)
+  - Node.js                  : Runtime (ES Modules)
+  - Express v4.21.2          : HTTP server, proxy API, static files
+  - @supabase/supabase-js v2 : Client Supabase (anon & service role)
+  - cors v2.8.5              : CORS middleware
+  - dotenv v16.4.7           : Load biến môi trường
+  - express-rate-limit v8.5.2: Giới hạn rate API
+  - node:crypto              : SHA-256 hashing cho API key
+
+2.3. Dịch vụ bên ngoài
+  - OpenWeatherMap           : Thời tiết & ô nhiễm không khí
+  - GNews API                : Tin tức môi trường
+  - Supabase                 : PostgreSQL, Auth, cache
+  - jsDelivr (world-atlas@2) : GeoJSON quốc gia
+  - Unpkg                    : Globe.gl, textures
+  - Google Fonts             : Inter, Playfair Display, Orbitron, Rajdhani
+
+2.4. Triển khai
+  - npm                      : Quản lý package
+  - Render (production)      : Cloud deployment
+  - GitHub Pages             : Static hosting
+
+
+3. KIẾN TRÚC HỆ THỐNG
+--------------------------------------------------------------------------------
+  Mô hình: Monolithic SPA + Backend Proxy
+
+  Backend (server.js) đảm nhiệm:
+    - Static file server
+    - Proxy API (giấu API key client)
+    - Scheduled jobs (đồng bộ thời tiết 2h/lần, tính NRI 2.5h/lần)
+    - Public REST API (xác thực bằng API key)
+
+  Luồng dữ liệu:
+    User Interaction
+      -> main.js (Controller - quản lý state toàn cục)
+        -> globe-config.js  (render 3D globe, polygons, textures)
+        -> search.js        (tìm kiếm quốc gia)
+        -> city-panel.js    (thời tiết, biểu đồ lịch sử)
+        -> api.js           (gọi backend proxy)
+          -> server.js      (gọi OpenWeatherMap, GNews, Supabase)
+
+
+4. CÁC MODULE CHÍNH (Client)
+--------------------------------------------------------------------------------
+  File                      Vai trò
+  ----                      -------
+  main.js                   Controller trung tâm: load JSON, quản lý state
+                            (selectedCountry, activeLayer, activeYear),
+                            chuyển đổi layer, xử lý timeline, tạo panels.
+
+  globe-config.js           Khởi tạo Globe() với texture blue marble +
+                            bump map; renderPolygons() vẽ các quốc gia;
+                            applyGlobeTexture() đổi texture globe;
+                            getCountryView() tính góc camera tối ưu.
+
+  data.js                   Dữ liệu tĩnh: GLOBAL_DATA (nhiệt độ, PM2.5,
+                            rừng trung bình), LAYER_YEARS, LAYER_IMAGES,
+                            COUNTRY_ALIASES, NAME_TO_ISO, các hàm helper
+                            (matchCountry, findCitiesForCountry...).
+
+  city-panel.js             Panel thời tiết thành phố: fetch live weather
+                            + pollution, Supabase fallback, render 3 city
+                            cards + biểu đồ lịch sử (tabs Live/History).
+
+  search.js                 Thanh tìm kiếm quốc gia với real-time filter,
+                            keyboard navigation, dropdown (max 8 kết quả).
+
+  chart-utils.js            Vẽ biểu đồ cột bằng Canvas 2D API thuần:
+                            buildBarChart() (panel chính), drawHistoryCanvas()
+                            (panel thành phố), hỗ trợ HiDPI/Retina.
+
+  api.js                    Client API: getCurrentWeather(), getAirPollution(),
+                            getEnvironmentNews() -> gọi backend proxy /api/*.
+
+  auth.js                   Xác thực Supabase Auth (sign in/up/reset),
+                            quản lý API key (generate, list, revoke).
+
+  weather-db.js             Cache fallback từ Supabase city_weather.
+
+  app.js                    Điều hướng trang, active nav, mobile menu.
+
+
+5. CÁC MODULE CHÍNH (Server)
+--------------------------------------------------------------------------------
+  File                      Vai trò
+  ----                      -------
+  server.js                 Express server với các chức năng:
+    - Static file serving
+    - /api/weather, /api/pollution: proxy OpenWeatherMap
+    - /api/news: proxy GNews + cache Supabase
+    - /api/eco-scores: lấy NRI từ Supabase
+    - /api/insights: CRUD reviews
+    - /api/keys: quản lý API key (SHA-256 hash)
+    - /api/historical, /api/events: public REST API (rate-limited)
+    - Scheduled jobs: refreshAllCities() (2h), calculateEcoScores() (2.5h)
+    - Self-ping (5 phút) chống Render sleep
+
+
+6. DỮ LIỆU
+--------------------------------------------------------------------------------
+  data/country.json         ~1760 dòng: danh sách quốc gia + 3 thành phố mỗi nước
+  data/historical_data.json ~6329 dòng: {iso3: {temp:{1995..2020}, pm25:{...}, forest:{...}}}
+  data/event.json           ~1171 dòng: {year: [{id, title, lat, lng, type, ...}]}
+
+  assets/layers/nhietdo_layer/     7 texture WebP (nhiệt độ 1995-2025)
+  assets/layers/buimin_layer/      6 texture WebP (PM2.5 1995-2020)
+  assets/layers/dientichrung_layer/ 6 texture WebP (rừng 2000-2025)
+
+
+7. THUẬT TOÁN & KỸ THUẬT CỐT LÕI
+--------------------------------------------------------------------------------
+7.1. National Risk Index (NRI)
+  Base Risk Scores (từng thành phố):
+    R_PM2.5  = (PM2.5 / 25)^1.5
+    R_Temp   = (|Temp - 22| / 10)^2
+
+  City Risk Score (CRS):
+    CRS = max( max(R_PM2.5, R_Temp) * (1 + 0.15*(AQI-1)), AQI^2 )
+
+  National Risk Index (RMS của top 3 CRS cao nhất):
+    NRI = sqrt( (CRS_1^2 + CRS_2^2 + CRS_3^2) / 3 )
+
+  Visual mapping trên globe:
+    <=1   : Xanh lá nhạt  (An toàn)
+    1-4   : Xanh lá đậm   (Rủi ro thấp)
+    4-9   : Vàng          (Trung bình)
+    9-16  : Đỏ            (Báo động)
+    >16   : Tím           (Thảm họa)
+
+7.2. 3D Globe Rendering
+  - Globe() tạo Three.js globe với texture blue marble + bump map
+  - Polygon altitude: base 0.01, selected 0.02 (tạo hiệu ứng nổi)
+  - Layer overlay: đổi texture globe thành WebP heatmap theo năm
+  - Camera: d3.geoCentroid + d3.geoBounds -> altitude động (0.28-1.2)
+  - Layout: translateX(-180px) khi chọn quốc gia, scale 88% + shift khi
+    có layer active
+
+7.3. Chart.js — Bar Charts
+  - Thư viện Chart.js v4.4.7 thay thế hoàn toàn code Canvas thuần
+  - Hai hàm: buildBarChart() (info panel toàn cầu), drawHistoryCanvas()
+    (history charts theo quốc gia)
+  - DataLabel plugin tự viết: vẽ giá trị số trên đỉnh mỗi cột, active year
+    dùng font Orbitron bold + màu layer
+  - Tự động destroy instance cũ trước khi tạo mới (chống memory leak)
+  - animation: false để tránh hiệu ứng giật khi chuyển năm
+  - base: yMin cho history charts — xử lý đúng giá trị âm (nhiệt độ dưới 0)
+
+7.4. Chiến lược Cache Thời tiết
+  - Primary: OpenWeatherMap qua backend proxy
+  - Fallback: Supabase city_weather table
+  - Server sync: refreshAllCities() chạy batch 15 cities, delay 30s giữa
+    các batch để tránh rate limit
+
+7.5. Visualization Sự kiện Môi trường
+  - Dữ liệu từ data/event.json, lọc theo năm
+  - Dạng dots màu trên globe: flood=xanh dương, wildfire=đỏ, v.v.
+  - Click vào dot mở slide-in panel với thông tin chi tiết
+
+7.6. Bảo mật API Key
+  - Server hash key bằng SHA-256 trước khi lưu
+  - Public API rate limit 30 requests/phút/key
+  - Key management yêu cầu Supabase JWT (Bearer token)
+  - CORS whitelist: localhost, GitHub Pages, Render
+
+
+8. GRAPH PHỤ THUỘC MODULE (Client)
+--------------------------------------------------------------------------------
+  index.html
+    +-- api-keys.js -> window.EcoLensApiKeys
+    +-- supabase-js (CDN)
+    +-- app.js      -> navigateTo(), highlightActiveNav()
+    +-- auth.js     -> window.EcoLensAuth
+
+  explore_earth.html
+    +-- api-keys.js
+    +-- supabase-js, D3.js, Globe.gl, TopoJSON, Chart.js (CDN)
+    +-- app.js, auth.js
+    +-- main.js (Entry Point - ES Module)
+          +-- data.js
+          +-- globe-config.js
+          +-- search.js
+          +-- city-panel.js
+                +-- api.js
+                +-- chart-utils.js
+                +-- weather-db.js
+                +-- data.js
+          +-- chart-utils.js
+
+  news.html
+    +-- news.js -> api.js, EcoLensAuth
+
+  feedback.html
+    +-- reviews.js -> EcoLensAuth
+
+
+================================================================================
+  HẾT
+================================================================================
