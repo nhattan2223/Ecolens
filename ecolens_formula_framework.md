@@ -8,10 +8,10 @@ This logic can be directly integrated into the Backend service.
 
 ## Step 1: Calculate Base Risk Scores (Base Risk)
 
-Compute the baseline risk levels for Temperature and $	ext{PM}_{2.5}$ based on biological safety thresholds. An exponential factor ensures risk scores spike drastically when safety thresholds are breached.
+Compute the baseline risk levels for Temperature and $\text{PM}_{2.5}$ based on biological safety thresholds. An exponential factor ensures risk scores spike drastically when safety thresholds are breached.
 
-### 1. Fine Particulate Matter ($	ext{PM}_{2.5}$) Risk
-Based on the WHO standard threshold of 25 $\mu	ext{g/m}^3$.
+### 1. Fine Particulate Matter ($\text{PM}_{2.5}$) Risk
+Based on the WHO standard threshold of 25 $\mu\text{g/m}^3$.
 
 $$R_{PM2.5} = \left(\frac{PM_{2.5}}{25}\right)^{1.5}$$
 
@@ -29,8 +29,8 @@ Combines the AQI amplification factor and a protection floor (Risk Floor) to cal
 $$CRS = \max \left[ \left( \max(R_{PM2.5}, R_{Temp}) \times (1 + 0.15 \times (AQI - 1)) \right), (AQI)^2 \right]$$
 
 ### Operational Logic
-* **Amplification:** The system identifies the maximum risk between Temperature and $	ext{PM}_{2.5}$, then applies an amplification factor of up to 60% based on the overall AQI severity (scaled from 1 to 5).
-* **Safety Floor:** If both $	ext{PM}_{2.5}$ and Temperature are perfectly safe ($R = 0$) but an alternative toxic gas leak drives the AQI up to 5, the outer $\max$ function activates, setting the safety floor to $5^2 = 25$ points. This prevents catastrophic edge cases from being ignored.
+* **Amplification:** The system identifies the maximum risk between Temperature and $\text{PM}_{2.5}$, then applies an amplification factor of up to 60% based on the overall AQI severity (scaled from 1 to 5).
+* **Safety Floor:** If both $\text{PM}_{2.5}$ and Temperature are perfectly safe ($R = 0$) but an alternative toxic gas leak drives the AQI up to 5, the outer $\max$ function activates, setting the safety floor to $5^2 = 25$ points. This prevents catastrophic edge cases from being ignored.
 
 ---
 
