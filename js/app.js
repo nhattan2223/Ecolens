@@ -5,7 +5,8 @@ const PAGE_URL_MAP = {
   about: 'about_us.html',
   explore: 'explore_earth.html',
   news: 'news.html',
-  reviews: 'feedback.html'
+  reviews: 'feedback.html',
+  'api-keys': 'api-keys.html'
 };
 
 function navigateTo(page) {

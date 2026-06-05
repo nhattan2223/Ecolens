@@ -102,34 +102,46 @@ function renderAuthUI() {
 
   if (currentUser) {
     const email = currentUser.email || 'User';
-    const btnHtml = `<button class="nav-link auth-btn" onclick="EcoLensAuth.signOut()" style="opacity:1;display:inline-flex;align-items:center;gap:6px;" title="Sign out">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      ${email}
-    </button>`;
+    const btnHtml = `<div style="display:inline-flex;align-items:center;gap:4px;">
+      <button class="nav-link auth-btn" onclick="EcoLensAuth.signOut()" style="opacity:1;display:inline-flex;align-items:center;gap:6px;" title="Sign out">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        ${email}
+      </button>
+    </div>`;
 
     if (navLinks) {
       let existing = navLinks.querySelector('.auth-btn');
       if (existing) existing.remove();
+      let existingApi = navLinks.querySelector('.api-keys-nav-link');
+      if (existingApi) existingApi.remove();
       navLinks.insertAdjacentHTML('beforeend', btnHtml);
     }
     if (ecoNavLinks) {
       let existing = ecoNavLinks.querySelector('.auth-btn');
       if (existing) existing.remove();
+      let existingApi = ecoNavLinks.querySelector('.api-keys-nav-link');
+      if (existingApi) existingApi.remove();
       ecoNavLinks.insertAdjacentHTML('beforeend', btnHtml.replace('nav-link', 'eco-nav-link'));
     }
 
-    const mobileBtnHtml = `<button onclick="EcoLensAuth.signOut()" style="font-size:1.2rem;opacity:.6;text-align:left;border-top:1px solid rgba(255,255,255,.1);padding-top:1rem;margin-top:1rem;background:none;border:none;color:#fff;cursor:pointer;">
-      Sign out — ${email}
-    </button>`;
+    const mobileBtnHtml = `<div style="display:flex;flex-direction:column;gap:6px;margin-top:1rem;border-top:1px solid rgba(255,255,255,.1);padding-top:1rem;">
+      <button onclick="EcoLensAuth.signOut()" style="font-size:1.2rem;opacity:.6;text-align:left;background:none;border:none;color:#fff;cursor:pointer;">
+        Sign out — ${email}
+      </button>
+    </div>`;
 
     if (mobileNav) {
       let existing = mobileNav.querySelector('.auth-mobile-btn');
       if (existing) existing.remove();
+      let existingApi = mobileNav.querySelector('.api-keys-mobile-link');
+      if (existingApi) existingApi.remove();
       mobileNav.insertAdjacentHTML('beforeend', `<div class="auth-mobile-btn">${mobileBtnHtml}</div>`);
     }
     if (ecoMobileNav) {
       let existing = ecoMobileNav.querySelector('.auth-mobile-btn');
       if (existing) existing.remove();
+      let existingApi = ecoMobileNav.querySelector('.api-keys-mobile-link');
+      if (existingApi) existingApi.remove();
       ecoMobileNav.insertAdjacentHTML('beforeend', `<div class="auth-mobile-btn">${mobileBtnHtml}</div>`);
     }
   } else {
@@ -141,22 +153,30 @@ function renderAuthUI() {
     if (navLinks) {
       let existing = navLinks.querySelector('.auth-btn');
       if (existing) existing.remove();
+      let existingApi = navLinks.querySelector('.api-keys-nav-link');
+      if (existingApi) existingApi.remove();
       navLinks.insertAdjacentHTML('beforeend', btnHtml);
     }
     if (ecoNavLinks) {
       let existing = ecoNavLinks.querySelector('.auth-btn');
       if (existing) existing.remove();
+      let existingApi = ecoNavLinks.querySelector('.api-keys-nav-link');
+      if (existingApi) existingApi.remove();
       ecoNavLinks.insertAdjacentHTML('beforeend', btnHtml.replace('nav-link', 'eco-nav-link'));
     }
 
     if (mobileNav) {
       let existing = mobileNav.querySelector('.auth-mobile-btn');
       if (existing) existing.remove();
+      let existingApi = mobileNav.querySelector('.api-keys-mobile-link');
+      if (existingApi) existingApi.remove();
       mobileNav.insertAdjacentHTML('beforeend', `<button class="auth-mobile-btn" onclick="openAuthModal()" style="font-size:1.2rem;opacity:.6;text-align:left;background:none;border:none;color:#fff;cursor:pointer;border-top:1px solid rgba(255,255,255,.1);padding-top:1rem;margin-top:1rem;">Sign In</button>`);
     }
     if (ecoMobileNav) {
       let existing = ecoMobileNav.querySelector('.auth-mobile-btn');
       if (existing) existing.remove();
+      let existingApi = ecoMobileNav.querySelector('.api-keys-mobile-link');
+      if (existingApi) existingApi.remove();
       ecoMobileNav.insertAdjacentHTML('beforeend', `<button class="auth-mobile-btn" onclick="openAuthModal()" style="font-size:1.2rem;opacity:.6;text-align:left;background:none;border:none;color:#fff;cursor:pointer;border-top:1px solid rgba(255,255,255,.1);padding-top:1rem;margin-top:1rem;">Sign In</button>`);
     }
   }
@@ -468,7 +488,122 @@ authDb.auth.onAuthStateChange((event, session) => {
   dispatchAuthEvent(event, currentUser);
 });
 
-// ── Init ─────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// API KEY MANAGER
+// ══════════════════════════════════════════════════════════════
+
+const BACKEND = window.EcoLensApiKeys?.BACKEND_URL || 'http://localhost:3000';
+
+async function apiFetch(url, options) {
+  const res = await fetch(url, options);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+  return data;
+}
+
+async function getToken() {
+  const { data: { session } } = await authDb.auth.getSession();
+  return session?.access_token || null;
+}
+
+async function loadApiKeys() {
+  const container = document.getElementById('apikey-items');
+  const errorEl = document.getElementById('apikey-error');
+  if (!container) return;
+  container.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,.35);text-align:center;padding:1rem;font-family:var(--eco-globe-font,\'Rajdhani\',sans-serif);">Loading…</div>';
+  errorEl.style.display = 'none';
+  try {
+    const token = await getToken();
+    if (!token) throw new Error('Not authenticated');
+    const data = await apiFetch(`${BACKEND}/api/v1/keys`, {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (!data.keys || data.keys.length === 0) {
+      container.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,.35);text-align:center;padding:1rem;font-family:var(--eco-globe-font,\'Rajdhani\',sans-serif);">No API keys yet. Generate one above.</div>';
+      return;
+    }
+    container.innerHTML = data.keys.map(k => {
+      const date = new Date(k.created_at).toLocaleDateString();
+      const last = k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : 'Never';
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 1rem;background:rgba(0,0,0,.3);border:1px solid ${k.is_active ? 'rgba(52,211,153,.15)' : 'rgba(244,67,54,.2)'};border-radius:10px;">
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <div style="font-size:13px;font-weight:600;color:#fff;font-family:var(--eco-globe-font,'Rajdhani',sans-serif);">${k.name || 'Untitled'} <span style="font-size:11px;color:rgba(255,255,255,.35);font-family:monospace;">${k.key_prefix}</span></div>
+          <div style="font-size:10px;color:rgba(255,255,255,.35);font-family:var(--eco-globe-font,'Rajdhani',sans-serif);">Created: ${date} · Last used: ${last}</div>
+        </div>
+        ${k.is_active ? `<button onclick="revokeApiKey('${k.id}')" style="padding:.4rem .8rem;background:rgba(244,67,54,.15);border:1px solid rgba(244,67,54,.3);border-radius:6px;color:#f87171;font-size:10px;text-transform:uppercase;cursor:pointer;font-family:var(--eco-globe-font,'Rajdhani',sans-serif);">Revoke</button>` : '<span style="font-size:10px;color:#f87171;font-family:var(--eco-globe-font,\'Rajdhani\',sans-serif);text-transform:uppercase;">Revoked</span>'}
+      </div>`;
+    }).join('');
+  } catch (err) {
+    container.innerHTML = '';
+    errorEl.textContent = 'Failed to load keys: ' + err.message;
+    errorEl.style.display = 'block';
+  }
+}
+
+async function generateApiKey() {
+  const btn = document.getElementById('apikey-generate-btn');
+  const nameInput = document.getElementById('apikey-name-input');
+  const resultEl = document.getElementById('apikey-result');
+  const valueEl = document.getElementById('apikey-value');
+  const errorEl = document.getElementById('apikey-error');
+  errorEl.style.display = 'none';
+  btn.textContent = 'Generating…';
+  btn.disabled = true;
+  try {
+    const token = await getToken();
+    if (!token) throw new Error('Not authenticated');
+    const data = await apiFetch(`${BACKEND}/api/v1/keys`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ name: nameInput?.value || '' })
+    });
+    valueEl.value = data.key;
+    resultEl.style.display = 'block';
+    nameInput.value = '';
+    loadApiKeys();
+  } catch (err) {
+    errorEl.textContent = 'Failed to generate key: ' + err.message;
+    errorEl.style.display = 'block';
+  } finally {
+    btn.textContent = 'Generate';
+    btn.disabled = false;
+  }
+}
+
+async function revokeApiKey(id) {
+  if (!confirm('Revoke this API key? This cannot be undone.')) return;
+  const errorEl = document.getElementById('apikey-error');
+  errorEl.style.display = 'none';
+  try {
+    const token = await getToken();
+    if (!token) throw new Error('Not authenticated');
+    await apiFetch(`${BACKEND}/api/v1/keys/revoke`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ id })
+    });
+    loadApiKeys();
+  } catch (err) {
+    errorEl.textContent = 'Failed to revoke key: ' + err.message;
+    errorEl.style.display = 'block';
+  }
+}
+
+function copyApiKey() {
+  const el = document.getElementById('apikey-value');
+  if (!el) return;
+  el.select();
+  navigator.clipboard.writeText(el.value).catch(() => {});
+}
+
+// ── Expose API key functions globally ──────────────────────
+window.generateApiKey = generateApiKey;
+window.revokeApiKey = revokeApiKey;
+window.copyApiKey = copyApiKey;
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   initSession();
 });

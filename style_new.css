@@ -641,8 +641,7 @@ input, textarea { font-family: inherit; color: inherit; }
   animation: pulse 1.5s ease-in-out infinite;
 }
 .status-dot.critical { background: #ef4444; }
-.status-dot.warning  { background: #f97316; }
-.status-dot.stable   { background: var(--emerald); }
+
 
 .viewer-top-right { position: absolute; top: 2rem; right: 2rem; }
 .viewer-btn {
@@ -713,24 +712,6 @@ input, textarea { font-family: inherit; color: inherit; }
 .hotspot-item.active .hotspot-icon svg { animation: rotateFull .8s ease-in-out; }
 @keyframes rotateFull { to { transform: rotate(360deg); } }
 
-.hotspot-id { font-size: 10px; text-transform: uppercase; letter-spacing: .2em; opacity: .4; }
-.hotspot-name { font-family: var(--font-disp); font-size: 1.1rem; text-transform: uppercase; letter-spacing: -.03em; margin-bottom: .5rem; }
-.hotspot-alert { font-size: .75rem; color: rgba(255,255,255,.4); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-
-.hotspot-add-filter {
-  padding: 2.5rem;
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  opacity: .2;
-  pointer-events: none;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: .2em;
-}
-.hotspot-add-filter svg { width: 1.25rem; height: 1.25rem; }
 
 .search-wrap { position: relative; }
 .search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); width: 1rem; height: 1rem; color: rgba(255,255,255,.2); pointer-events: none; }
@@ -984,24 +965,43 @@ input, textarea { font-family: inherit; color: inherit; }
 }
 .review-cta-card svg { width: 2.5rem; height: 2.5rem; margin-bottom: 1.5rem; }
 
-/* ===================== FOOTER ===================== */
-.site-footer {
-  padding: 3rem 4rem;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  align-items: center;
-  opacity: .4;
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: .2em;
-  font-weight: 500;
-  /*border-top: 1px solid var(--border); */
-}
-@media (min-width: 768px) {
-  .site-footer {
-    flex-direction: row;
-    justify-content: space-between;
-  }
-}
-.footer-left, .footer-right { display: flex; gap: 3rem; }
+/* ===================== API KEYS PAGE ===================== */
+.api-section { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 28px 32px; margin-bottom: 24px; }
+.endpoint { display: flex; align-items: center; gap: 8px; margin: 6px 0; padding: 8px 12px; background: rgba(0,0,0,.3); border-radius: 8px; font-family: 'Courier New', monospace; font-size: 12px; }
+.endpoint .method { font-weight: 700; color: #34d399; }
+.endpoint .path { color: rgba(255,255,255,.7); }
+.api-generate-row { display: flex; gap: 10px; margin-bottom: 16px; }
+.api-generate-row input { flex: 1; padding: 12px 16px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 10px; color: #fff; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; transition: border-color .2s; }
+.api-generate-row input:focus { border-color: #34d399; }
+.api-generate-row button { padding: 12px 24px; background: #059669; border: none; border-radius: 10px; color: #fff; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; white-space: nowrap; transition: background .2s; font-family: 'Inter', sans-serif; }
+.api-generate-row button:hover { background: #10b981; }
+.api-generate-row button:disabled { opacity: .5; cursor: not-allowed; }
+.api-key-result { display: none; padding: 16px; background: rgba(52,211,153,.1); border: 1px solid rgba(52,211,153,.25); border-radius: 10px; margin-bottom: 16px; }
+.api-key-result .label { font-size: 11px; color: #34d399; font-weight: 600; margin-bottom: 8px; }
+.api-key-result .key-row { display: flex; gap: 8px; }
+.api-key-result .key-row input { flex: 1; padding: 10px; background: rgba(0,0,0,.3); border: 1px solid rgba(255,255,255,.1); border-radius: 6px; color: #8cff7a; font-size: 13px; font-family: 'Courier New', monospace; outline: none; }
+.api-key-result .key-row button { padding: 10px 16px; background: rgba(52,211,153,.15); border: 1px solid rgba(52,211,153,.3); border-radius: 6px; color: #34d399; font-size: 11px; cursor: pointer; font-family: 'Inter', sans-serif; transition: background .2s; }
+.api-key-result .key-row button:hover { background: rgba(52,211,153,.25); }
+.api-error { color: #f87171; font-size: 12px; margin-top: 12px; display: none; }
+.api-auth-required { text-align: center; padding: 60px 20px; }
+.api-auth-required h2 { font-family: 'Rajdhani', sans-serif; font-size: 22px; color: rgba(255,255,255,.6); margin-bottom: 12px; }
+.api-auth-required button { padding: 12px 28px; background: #059669; border: none; border-radius: 10px; color: #fff; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
+.api-auth-required button:hover { background: #10b981; }
+
+/* ===================== API KEYS PAGE LAYOUT ===================== */
+.page-api-keys .features-grid { align-items:stretch; }
+@media (min-width: 1024px) { .page-api-keys .features-grid { grid-template-columns:repeat(4,1fr); } }
+.page-api-keys .feature-card { display:flex; flex-direction:column; padding:2rem; min-width:0; }
+.page-api-keys .feature-card > * { flex-shrink:0; max-width:100%; }
+.page-api-keys .feature-card .feature-desc { flex:1; min-width:0; }
+.page-api-keys .feature-card .endpoint { min-width:0; overflow-x:auto; }
+.page-api-keys .feature-card .endpoint .path { white-space:nowrap; }
+.page-api-keys .feature-card pre { overflow-x:auto; white-space:pre; }
+.page-api-keys .hero-desc { max-width:50%; }
+.page-api-keys .feature-card .endpoint::-webkit-scrollbar,
+.page-api-keys .feature-card pre::-webkit-scrollbar { width:3px; height:3px; }
+.page-api-keys .feature-card .endpoint::-webkit-scrollbar-track,
+.page-api-keys .feature-card pre::-webkit-scrollbar-track { background:transparent; }
+.page-api-keys .feature-card .endpoint::-webkit-scrollbar-thumb,
+.page-api-keys .feature-card pre::-webkit-scrollbar-thumb { background:rgba(52,211,153,0.25); border-radius:2px; }
+@media (min-width: 1024px) { .page-api-keys .page-inner { padding-left:2rem; padding-right:2rem; } }

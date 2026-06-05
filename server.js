@@ -5,6 +5,8 @@ import { createClient } from '@supabase/supabase-js';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { randomBytes, createHash } from 'node:crypto';
+import rateLimit from 'express-rate-limit';
 
 dotenv.config();
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -13,8 +15,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const OWM_KEY = process.env.OPEN_WEATHER_KEY;
 const GNEWS_KEY = process.env.GNEWS_KEY;
-const SUPABASE = process.env.SUPABASE_URL && process.env.SUPABASE_KEY
-  ? createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
+const SUPABASE_URL = process.env.SUPABASE_URL;
+
+const SUPABASE = SUPABASE_URL && process.env.SUPABASE_KEY
+  ? createClient(SUPABASE_URL, process.env.SUPABASE_KEY)
+  : null;
+
+const SUPABASE_SERVICE = SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY
+  ? createClient(SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
   : null;
 
 app.use(cors());
@@ -35,12 +43,70 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-API-Key, Authorization');
   if (req.method === 'OPTIONS') return res.sendStatus(200);
   next();
 });
 
-function requireKey(req, res, next) {
+// ── Rate limiter cho API endpoints ───────────────────────────
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Rate limit: 30 req/min per key.' },
+});
+
+// ── API Key authentication middleware ────────────────────────
+async function requireApiKey(req, res, next) {
+  const apiKey = req.headers['x-api-key'];
+  if (!apiKey) return res.status(401).json({ error: 'Missing X-API-Key header' });
+
+  try {
+    const hash = createHash('sha256').update(apiKey).digest('hex');
+    if (!SUPABASE_SERVICE) return res.status(500).json({ error: 'API key verification unavailable' });
+
+    const { data, error } = await SUPABASE_SERVICE
+      .from('api_keys')
+      .select('id, user_id, is_active')
+      .eq('key_hash', hash)
+      .single();
+
+    if (error || !data) return res.status(401).json({ error: 'Invalid API key' });
+    if (!data.is_active) return res.status(401).json({ error: 'API key has been revoked' });
+
+    // Update last_used_at (fire-and-forget)
+    SUPABASE_SERVICE.from('api_keys')
+      .update({ last_used_at: new Date().toISOString() })
+      .eq('id', data.id)
+      .then().catch(() => {});
+
+    req.apiKeyUserId = data.user_id;
+    next();
+  } catch (err) {
+    console.error('[apiKey] Error:', err.message);
+    res.status(500).json({ error: 'API key verification failed' });
+  }
+}
+
+// ── Verify Supabase JWT (for key management endpoints) ─────
+async function requireUser(req, res, next) {
+  const auth = req.headers.authorization;
+  if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({ error: 'Missing Authorization header' });
+
+  try {
+    if (!SUPABASE) return res.status(500).json({ error: 'Auth service unavailable' });
+    const { data: { user }, error } = await SUPABASE.auth.getUser(auth.slice(7));
+    if (error || !user) return res.status(401).json({ error: 'Invalid or expired token' });
+    req.user = user;
+    next();
+  } catch (err) {
+    console.error('[auth] Error:', err.message);
+    res.status(500).json({ error: 'Auth verification failed' });
+  }
+}
+
+function requireOwmKey(req, res, next) {
   if (!OWM_KEY) return res.status(500).json({ error: 'Missing OPEN_WEATHER_KEY on server' });
   next();
 }
@@ -51,7 +117,7 @@ function isValidCoordinate(value, min, max) {
 }
 
 // ── Proxy: Current weather ─────────────────────────────────
-app.get('/api/weather', requireKey, async (req, res) => {
+app.get('/api/weather', requireOwmKey, async (req, res) => {
   try {
     const { lat, lon } = req.query;
     if (!isValidCoordinate(lat, -90, 90) || !isValidCoordinate(lon, -180, 180)) {
@@ -68,7 +134,7 @@ app.get('/api/weather', requireKey, async (req, res) => {
 });
 
 // ── Proxy: Air pollution ───────────────────────────────────
-app.get('/api/pollution', requireKey, async (req, res) => {
+app.get('/api/pollution', requireOwmKey, async (req, res) => {
   try {
     const { lat, lon } = req.query;
     if (!isValidCoordinate(lat, -90, 90) || !isValidCoordinate(lon, -180, 180)) {
@@ -204,9 +270,137 @@ setTimeout(() => {
   setInterval(calculateEcoScores, 7200000);
 }, 1800000);
 
+// ══════════════════════════════════════════════════════════════
+// API KEY MANAGEMENT (requires Supabase JWT)
+// ══════════════════════════════════════════════════════════════
+
+// ── Generate a new API key ──────────────────────────────────
+app.post('/api/v1/keys', requireUser, async (req, res) => {
+  try {
+    const name = (req.body.name || '').trim().slice(0, 100);
+    const rawKey = 'ec_' + randomBytes(32).toString('hex');
+    const hash = createHash('sha256').update(rawKey).digest('hex');
+    const prefix = rawKey.slice(0, 12) + '…';
+
+    if (!SUPABASE_SERVICE) return res.status(500).json({ error: 'Key service unavailable' });
+
+    const { error } = await SUPABASE_SERVICE.from('api_keys').insert({
+      user_id: req.user.id,
+      key_hash: hash,
+      key_prefix: prefix,
+      name,
+    });
+
+    if (error) return res.status(500).json({ error: 'Failed to create key: ' + error.message });
+
+    res.status(201).json({ key: rawKey, prefix, name });
+    console.log(`[apiKeys] Key generated for user ${req.user.id}`);
+  } catch (err) {
+    console.error('[apiKeys] Generate error:', err.message);
+    res.status(500).json({ error: 'Failed to generate key' });
+  }
+});
+
+// ── List user's API keys ────────────────────────────────────
+app.get('/api/v1/keys', requireUser, async (req, res) => {
+  try {
+    if (!SUPABASE_SERVICE) return res.status(500).json({ error: 'Key service unavailable' });
+
+    const { data, error } = await SUPABASE_SERVICE
+      .from('api_keys')
+      .select('id, key_prefix, name, created_at, last_used_at, is_active')
+      .eq('user_id', req.user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ keys: data });
+  } catch (err) {
+    console.error('[apiKeys] List error:', err.message);
+    res.status(500).json({ error: 'Failed to list keys' });
+  }
+});
+
+// ── Revoke an API key ──────────────────────────────────────
+app.post('/api/v1/keys/revoke', requireUser, async (req, res) => {
+  try {
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ error: 'Missing key id' });
+
+    if (!SUPABASE_SERVICE) return res.status(500).json({ error: 'Key service unavailable' });
+
+    const { error } = await SUPABASE_SERVICE
+      .from('api_keys')
+      .update({ is_active: false })
+      .eq('id', id)
+      .eq('user_id', req.user.id);
+
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true });
+    console.log(`[apiKeys] Key ${id} revoked by user ${req.user.id}`);
+  } catch (err) {
+    console.error('[apiKeys] Revoke error:', err.message);
+    res.status(500).json({ error: 'Failed to revoke key' });
+  }
+});
+
+// ══════════════════════════════════════════════════════════════
+// PUBLIC API ENDPOINTS (requires X-API-Key)
+// ══════════════════════════════════════════════════════════════
+
+// ── Historical data for a country ───────────────────────────
+app.get('/api/v1/historical/:country', apiLimiter, requireApiKey, async (req, res) => {
+  try {
+    const country = req.params.country.toUpperCase();
+    const raw = await readFile(join(__dirname, 'data', 'historical_data.json'), 'utf-8');
+    const all = JSON.parse(raw);
+    const data = all[country] || null;
+    if (!data) return res.status(404).json({ error: 'Country not found', country });
+    res.json({ country, data });
+  } catch (err) {
+    console.error('[api] historical error:', err.message);
+    res.status(500).json({ error: 'Failed to load historical data' });
+  }
+});
+
+// ── Eco events ─────────────────────────────────────────────
+app.get('/api/v1/events', apiLimiter, requireApiKey, async (req, res) => {
+  try {
+    const raw = await readFile(join(__dirname, 'data', 'event.json'), 'utf-8');
+    const all = JSON.parse(raw);
+    let events = [];
+
+    for (const [year, list] of Object.entries(all)) {
+      for (const ev of list) {
+        events.push({ ...ev, year: parseInt(year) });
+      }
+    }
+
+    // Filter by year
+    if (req.query.year) {
+      const y = parseInt(req.query.year);
+      if (!isNaN(y)) events = events.filter(e => e.year === y);
+    }
+    // Filter by type
+    if (req.query.type) {
+      const t = req.query.type.toLowerCase();
+      events = events.filter(e => e.type.toLowerCase().includes(t));
+    }
+    // Filter by country
+    if (req.query.country) {
+      const c = req.query.country.toLowerCase();
+      events = events.filter(e => e.country.toLowerCase().includes(c));
+    }
+
+    res.json({ count: events.length, events });
+  } catch (err) {
+    console.error('[api] events error:', err.message);
+    res.status(500).json({ error: 'Failed to load events' });
+  }
+});
+
 // ── Health check ───────────────────────────────────────────
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', owm: !!OWM_KEY, gnews: !!GNEWS_KEY, supabase: !!SUPABASE });
+  res.json({ status: 'ok', owm: !!OWM_KEY, gnews: !!GNEWS_KEY, supabase: !!SUPABASE, supabaseService: !!SUPABASE_SERVICE });
 });
 
 app.listen(PORT, () => {
@@ -214,6 +408,7 @@ app.listen(PORT, () => {
   if (!OWM_KEY) console.warn('  WARN: OPEN_WEATHER_KEY not set');
   if (!GNEWS_KEY) console.warn('  WARN: GNEWS_KEY not set');
   if (!SUPABASE) console.warn('  WARN: Supabase not configured');
+  if (!SUPABASE_SERVICE) console.warn('  WARN: SUPABASE_SERVICE_KEY not set — API key auth will not work');
 
   // Tự ping mỗi 5 phút để Render không ngủ
   const PING_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;

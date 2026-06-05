@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcoLens | API Keys</title>
+  <link rel="icon" href="assets/images/leaf.ico"/>
+  <link rel="stylesheet" href="style_new.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="footer_styles.css" />
+</head>
+<body>
+
+  <!-- Background -->
+  <div class="bg-layer" aria-hidden="true">
+    <div class="bg-image"></div>
+    <div class="bg-overlay-dark"></div>
+    <div class="bg-gradient-tb"></div>
+    <div class="bg-glow bg-glow-top"></div>
+    <div class="bg-glow bg-glow-bottom"></div>
+  </div>
+
+  <!-- Decorative Side Elements -->
+  <div class="deco deco-right" aria-hidden="true">
+    <div class="deco-line"></div>
+    <span class="deco-text deco-text-right">Green Observation Satellite</span>
+    <div class="deco-line"></div>
+  </div>
+  <div class="deco deco-left" aria-hidden="true">
+    <span class="deco-text deco-text-left">ECO-LENS-01</span>
+    <div class="deco-line deco-line-tall"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav" id="main-nav">
+    <button class="nav-logo" onclick="navigateTo('home')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+      <div class="nav-brand">Eco<span class="nav-brand-dim">Lens</span></div>
+    </button>
+
+    <div class="nav-links" id="nav-links">
+      <button class="nav-link" data-page="home" onclick="navigateTo('home')">Home</button>
+      <button class="nav-link" data-page="about" onclick="navigateTo('about')">About Us</button>
+      <button class="nav-link" data-page="explore" onclick="navigateTo('explore')">Explore</button>
+      <button class="nav-link" data-page="news" onclick="navigateTo('news')">News</button>
+      <button class="nav-link" data-page="reviews" onclick="navigateTo('reviews')">Feedback</button>
+      <button class="nav-link" data-page="api-keys" onclick="navigateTo('api-keys')">API</button>
+    </div>
+
+    <button class="nav-hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <div class="mobile-menu-header">
+      <span class="mobile-menu-brand">ECOLENS</span>
+      <button class="mobile-menu-close" onclick="toggleMenu()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <nav class="mobile-nav">
+      <button onclick="navigateTo('home'); toggleMenu()">Home</button>
+      <button onclick="navigateTo('about'); toggleMenu()">About Us</button>
+      <button onclick="navigateTo('explore'); toggleMenu()">Explore</button>
+      <button onclick="navigateTo('news'); toggleMenu()">News</button>
+      <button onclick="navigateTo('reviews'); toggleMenu()">Feedback</button>
+      <button onclick="navigateTo('api-keys'); toggleMenu()">API</button>
+    </nav>
+    <div class="mobile-menu-footer">EST. 2026 — ENVIRONMENTAL DATA SOLUTIONS</div>
+  </div>
+
+  <!-- Page Content -->
+  <div class="page page-api-keys active" id="page-api-keys">
+    <main class="hero" style="padding-bottom:3rem;">
+      <div class="hero-inner">
+        <div class="hero-eyebrow">
+          <div class="eyebrow-line"></div>
+          <span class="text-micro emerald">Programmatic Access</span>
+        </div>
+        <h1 class="hero-title">
+          API <span class="hero-title-bold">Keys.</span>
+        </h1>
+        <div class="hero-body">
+          <div class="hero-separator hidden-mobile"></div>
+          <p class="hero-desc">
+            Access EcoLens environmental data programmatically — historical climate metrics, 
+            air quality records, and eco events from 1995 to present. Each key is rate-limited 
+            to ensure fair usage.
+          </p>
+          <div class="hero-cta">
+            <button class="btn-primary" onclick="document.getElementById('api-key-manager').scrollIntoView({behavior:'smooth'})" style="justify-content:center;font-size:13px;white-space:nowrap;">
+              Get Your Key
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/></svg>
+            </button>
+            <div class="cta-sub text-micro emerald-dim">Free for Research &amp; Non-Commercial Use</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Available Data -->
+    <div class="page-inner" style="padding-top:0;">
+      <section class="features-grid" style="margin-bottom:3rem;">
+        <div class="feature-card">
+          <div class="feature-top">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></svg>
+            </div>
+            <span class="feature-num">01</span>
+          </div>
+          <h3 class="feature-title">Historical Data</h3>
+          <p class="feature-desc">Temperature, PM2.5, and forest cover per country across 30 years (1995–2025).</p>
+          <div class="endpoint" style="margin-top:.75rem;"><span class="method">GET</span><span class="path">/api/v1/historical/:country</span></div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-top">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <span class="feature-num">02</span>
+          </div>
+          <h3 class="feature-title">Eco Events</h3>
+          <p class="feature-desc">Natural disasters, climate policies, industrial incidents with geographic coordinates.</p>
+          <div class="endpoint" style="margin-top:.75rem;"><span class="method">GET</span><span class="path">/api/v1/events?year=&amp;type=&amp;country=</span></div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-top">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <span class="feature-num">03</span>
+          </div>
+          <h3 class="feature-title">Rate Limited</h3>
+          <p class="feature-desc">30 requests per minute per key — sufficient for research, dashboards, and small-scale integrations.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-top">
+            <div class="feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <span class="feature-num">04</span>
+          </div>
+          <h3 class="feature-title">Easy Integration</h3>
+          <p class="feature-desc">Just add an <code style="background:rgba(52,211,153,.1);padding:1px 4px;border-radius:3px;">X-API-Key</code> header to your HTTP requests.</p>
+          <pre style="background:rgba(0,0,0,.3);border:none;border-radius:6px;padding:8px 10px;margin-top:.75rem;font-size:11px;line-height:1.5;"><code>curl -H "X-API-Key: ec_…" \
+  https://ecolens-backend-0w25.onrender.com/api/v1/historical/VNM</code></pre>
+          <pre style="background:rgba(0,0,0,.3);border:none;border-radius:6px;padding:8px 10px;margin-top:.5rem;font-size:11px;line-height:1.5;"><code>curl -H "X-API-Key: ec_…" \
+  "https://ecolens-backend-0w25.onrender.com/api/v1/events?year=2020&type=flood"</code></pre>
+        </div>
+      </section>
+
+      <!-- API Key Manager -->
+      <section class="api-section" id="api-key-manager" style="margin-bottom:3rem;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;">
+          <span style="font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:#34d399;letter-spacing:1px;">//</span>
+          <span style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#34d399;letter-spacing:1px;">Your API Keys</span>
+        </div>
+        <div id="api-keys-auth-required" class="api-auth-required" style="display:none;">
+          <h2>Sign in to manage API keys</h2>
+          <button onclick="openAuthModal()">Sign In</button>
+        </div>
+        <div id="api-keys-authenticated" style="display:none;">
+          <div class="api-generate-row">
+            <input id="apikey-name-input" type="text" placeholder="Key name (optional)" maxlength="100" />
+            <button id="apikey-generate-btn" onclick="generateApiKey()">Generate Key</button>
+          </div>
+          <div class="api-key-result" id="apikey-result">
+            <div class="label">New key generated — copy it now (shown once)</div>
+            <div class="key-row">
+              <input id="apikey-value" type="text" readonly />
+              <button onclick="copyApiKey()">Copy</button>
+            </div>
+          </div>
+          <div id="apikey-items"></div>
+          <div class="api-error" id="apikey-error"></div>
+        </div>
+      </section>
+
+      <!-- Stats -->
+      <section class="stats-grid" style="margin-bottom:3rem;">
+        <div class="stat-card">
+          <div class="stat-label text-micro">Historical Data</div>
+          <div class="stat-value emerald">30 Years</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label text-micro">Rate Limit</div>
+          <div class="stat-value">30 Req/Min</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label text-micro">Global Coverage</div>
+          <div class="stat-value">200+</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label text-micro">API Status</div>
+          <div class="stat-signal">
+            <span class="signal-dot"></span>
+            <span class="signal-text">Operational</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="eco-footer-b">
+    <div class="eco-footer-b__inner">
+      <div class="eco-footer-b__brand">
+        <div class="eco-footer-b__logo">
+          <div class="eco-footer-b__logo-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+            </svg>
+          </div>
+          <span class="eco-footer-b__logo-text">Eco<span>Lens</span></span>
+        </div>
+        <p class="eco-footer-b__tagline">Explore global environmental changes with interactive 3D technology. Real-time data fused with three decades of planetary records.</p>
+        <div class="eco-footer-b__status">
+          <span class="eco-footer-b__status-dot"></span>
+          Systems Operational — Live
+        </div>
+      </div>
+      <div class="eco-footer-b__col">
+        <div class="eco-footer-b__col-title">Quick Links</div>
+        <nav class="eco-footer-b__nav">
+          <button onclick="navigateTo('home')">Home</button>
+          <button onclick="navigateTo('about')">About Us</button>
+          <button onclick="navigateTo('reviews')">Feedback</button>
+        </nav>
+      </div>
+      <div class="eco-footer-b__col">
+        <div class="eco-footer-b__col-title">Key Features</div>
+        <nav class="eco-footer-b__nav">
+          <button onclick="navigateTo('explore')">Explore Globe</button>
+          <button onclick="navigateTo('news')">News Feed</button>
+          <button onclick="navigateTo('api-keys')">API</button>
+        </nav>
+      </div>
+      <div class="eco-footer-b__col">
+        <div class="eco-footer-b__col-title">Contact</div>
+        <div class="eco-footer-b__contact">
+          <div class="eco-footer-b__contact-row">
+            <div class="eco-footer-b__contact-icon">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </div>
+            <span>laptd.25ds@vku.udn.vn</span>
+          </div>
+          <div class="eco-footer-b__contact-row">
+            <div class="eco-footer-b__contact-icon">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.59 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <span>+(84)123-4567</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="eco-footer-b__bottom">
+      <div class="eco-footer-b__bottom-left">
+        <span>EcoLens Project</span>
+        <span>© 2026 Environment Intelligence</span>
+        <span>Vietnam / Global</span>
+      </div>
+      <div class="eco-footer-b__bottom-right">
+        <span class="eco-footer-b__bottom-sig">ECO-LENS-01 — HTML GROUP</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api-keys.js?v=2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/app.js?v=2"></script>
+  <script src="js/auth.js?v=1"></script>
+  <script>
+    // ── Page init ──
+    (function initPage() {
+      const authedEl = document.getElementById('api-keys-authenticated');
+      const unauthEl = document.getElementById('api-keys-auth-required');
+      const itemsEl  = document.getElementById('apikey-items');
+
+      function updateUI() {
+        const user = window.EcoLensAuth && window.EcoLensAuth.getUser();
+        if (user) {
+          if (authedEl) authedEl.style.display = 'block';
+          if (unauthEl) unauthEl.style.display = 'none';
+          if (typeof loadApiKeys === 'function') loadApiKeys();
+        } else {
+          if (authedEl) authedEl.style.display = 'none';
+          if (unauthEl) unauthEl.style.display = 'block';
+          if (itemsEl) itemsEl.innerHTML = '';
+        }
+      }
+
+      if (window.EcoLensAuth && window.EcoLensAuth.getUser() !== undefined) {
+        updateUI();
+      }
+
+      window.addEventListener('ecolens-auth-change', updateUI);
+    })();
+  </script>
+
+</body>
+</html>
