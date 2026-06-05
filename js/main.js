@@ -302,6 +302,10 @@ function setActiveLayer(layer) {
 
   if (activeLayer === layer) {
     // ─ TẮT layer hiện tại ─
+    if (activeLayer === 'eco_event') {
+      clearEventPoints();
+      hideEventPanel();
+    }
     activeLayer = null;
     activeYear  = null;
     ecoScoresMap = null;

@@ -60,6 +60,7 @@ export function renderPolygons(allPolygons, selectedCountry, isVietnamSelected, 
 
     .polygonCapColor(d => {
       if (ecoScores) {
+        if (isVietnamIsland(d)) return ecoColor(ecoScores['Vietnam']);
         return ecoColor(ecoScores[d.properties.name]);
       }
       if (isVietnamIsland(d))    return isVietnamSelected() ? 'rgba(140,255,122,0.15)' : 'rgba(255,255,255,0.05)';
